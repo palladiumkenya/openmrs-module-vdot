@@ -9,10 +9,8 @@
  */
 package org.openmrs.module.vdot.api.impl;
 
-import org.openmrs.api.APIException;
 import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.vdot.Item;
 import org.openmrs.module.vdot.api.VdotService;
 import org.openmrs.module.vdot.api.dao.VdotDao;
 
@@ -36,17 +34,4 @@ public class VdotServiceImpl extends BaseOpenmrsService implements VdotService {
 		this.userService = userService;
 	}
 	
-	@Override
-	public Item getItemByUuid(String uuid) throws APIException {
-		return dao.getItemByUuid(uuid);
-	}
-	
-	@Override
-	public Item saveItem(Item item) throws APIException {
-		if (item.getOwner() == null) {
-			item.setOwner(userService.getUser(1));
-		}
-		
-		return dao.saveItem(item);
-	}
 }

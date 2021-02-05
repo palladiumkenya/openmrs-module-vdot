@@ -34,7 +34,15 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.vdot.api.impl.VdotServiceImpl">
-                <property name="dao" ref="vdot.VdotDao" />
+                <property name="dao" >
+
+                <bean class="org.openmrs.module.vdot.api.dao.VdotDao">
+                    <property name="sessionFactory">
+                        <ref bean="sessionFactory" />
+
+                    </property>
+                </bean>
+        </property>
             </bean>
         </property>
         <property name="preInterceptors">
