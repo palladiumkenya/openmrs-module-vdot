@@ -1,0 +1,98 @@
+<!--
+  ~ The contents of this file are subject to the OpenMRS Public License
+  ~ Version 1.0 (the "License"); you may not use this file except in
+  ~ compliance with the License. You may obtain a copy of the License at
+  ~ http://license.openmrs.org
+  ~
+  ~ Software distributed under the License is distributed on an "AS IS"
+  ~ basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing rights and limitations
+  ~ under the License.
+  ~
+  ~ Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+-->
+<htmlform>
+
+
+    <script type="text/javascript" src="../moduleResources/kenyaemr/scripts/moment.js"></script>
+    <script type="text/javascript">
+
+    </script>
+
+    <style>
+        .simple-table {
+            border: solid 1px #DDEEEE;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font: normal 13px Arial, sans-serif;
+        }
+
+        .simple-table thead th {
+            background-color: #DDEFEF;
+            border: solid 1px #DDEEEE;
+            color: #336B6B;
+            padding: 10px;
+            text-align: left;
+            text-shadow: 1px 1px 1px #fff;
+        }
+
+        .simple-table td {
+            border: solid 1px #DDEEEE;
+            color: #333;
+            padding: 10px;
+            text-shadow: 1px 1px 1px #fff;
+        }
+    </style>
+
+    <div class="ke-form-header">
+        <table style="width: 100%">
+            <tr>
+                <td align="left">Enrolment Date:
+                    <encounterDate id="encounter-date" showTime="true"/>
+                </td>
+                <td align="right">Location:
+                    <encounterLocation default="GlobalProperty:kenyaemr.defaultLocation" type="autocomplete"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="ke-form-content">
+        <fieldset>
+            <legend>VDOT Client Enrollment </legend>
+
+            <table class ="simple-table" id="social-status-table">
+                <tr>
+                    <td>Enrollment ID?</td>
+                      <td>
+                        <span id="enroll-id"><patient id="enrollment-id" field="identifier" identifierTypeId="1dee27b7-0b92-49b3-978f-065e48f13560" /></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Client Status: </td>
+                    <td>
+                        <obs id="client-status" conceptId="161641"
+                             answerConceptIds="161636AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,5240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159492AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160432AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,111687AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,165062,161638AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162866AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159836AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,163133AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Active,Lost,Transfer,Dead,Mortality,Self transfer,Ongoing,Pending,Discontinued,Deleted"
+                                style="dropdown" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>On Care Status: </td>
+                    <td>
+                        <obs id="care-status" conceptId="165095"
+                             answerConceptIds="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Yes,No"
+                             style="radio" />
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <enrollInProgram programId="43b65fda-8c25-4478-a24c-bcc90e877f55"/>
+    </div>
+    <div class="ke-form-footer">
+        <submit/>
+    </div>
+
+</htmlform>
