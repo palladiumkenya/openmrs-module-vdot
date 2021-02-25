@@ -13,11 +13,22 @@
 	<description>Omod submodule for Vdot</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>kenyaemr-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>kenyaemr-omod</artifactId>
+		</dependency>
+
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>vdot-api</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>${project.parent.artifactId}-api</artifactId>
@@ -52,6 +63,26 @@
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>kenyacore-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>htmlformentry-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>calculation-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>appframework-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>htmlwidgets-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
