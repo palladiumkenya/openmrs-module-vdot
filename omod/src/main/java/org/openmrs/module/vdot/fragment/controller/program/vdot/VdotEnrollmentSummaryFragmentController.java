@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Kp program enrollment summary fragment
+ * Vdot program enrollment summary fragment
  */
 public class VdotEnrollmentSummaryFragmentController {
 	
