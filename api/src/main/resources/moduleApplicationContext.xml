@@ -84,9 +84,16 @@
                 <entry key="completion-summary" value="vdot:program/vdot/vdotCompletionSummary"/>
             </map>
         </property>
-        <property name="order" value="800" />
+        <property name="order" value="820" />
+    </bean>
 
-
+    <!-- Forms config -->
+    <bean id="vdot.config.form" class="org.openmrs.module.kenyacore.form.FormConfiguration">
+        <property name="commonVisitForms">
+            <set>
+                <ref bean="vdot.form.example" />
+             </set>
+        </property>
     </bean>
 
     <!-- Vdot enrollment form -->
@@ -101,9 +108,8 @@
             </set>
         </property>
         <property name="icon" value="kenyaui:forms/generic.png" />
-        <property name="htmlform" value="vdot:vdotClientEnrollment.html" />
-        <property name="order" value="231018" />
-    </bean>
+        <property name="htmlform" value="vdot:vdot/vdotClientEnrollment.html" />
+      </bean>
 
     <!--VDOT Completion -->
     <bean id="vdot.form.vdotClientDiscontinuation" class="org.openmrs.module.kenyacore.form.FormDescriptor">
@@ -117,7 +123,20 @@
             </set>
         </property>
         <property name="icon" value="kenyaui:forms/completion.png" />
-        <property name="htmlform" value="vdot:vdotClientDiscontinuation.html" />
+        <property name="htmlform" value="vdot:vdot/vdotClientDiscontinuation.html" />
+    </bean>
+
+    <!-- Forms addition -->
+    <bean id="vdot.form.example" class="org.openmrs.module.kenyacore.form.FormDescriptor">
+        <property name="targetUuid" value="b694b1bc-2086-47dd-a4ad-ba48f9471e4b" />
+        <property name="apps">
+            <set>
+                <ref bean="kenyaemr.app.clinician" />
+                <ref bean="kenyaemr.app.chart" />
+            </set>
+        </property>
+        <property name="icon" value="kenyaui:forms/generic.png" />
+        <property name="htmlform" value="vdot:example.html" />
     </bean>
 
 
