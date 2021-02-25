@@ -63,4 +63,62 @@
             </list>
         </property>
     </bean>
+
+    <!-- Adds Vdot Program Forms and reports -->
+
+    <!-- Program  -->
+    <bean id="vdot.program" class="org.openmrs.module.kenyacore.program.ProgramDescriptor">
+        <property name="targetUuid" value="b2b2dd4a-3aa5-4c98-93ad-4970b06819ef" />
+        <property name="eligibilityCalculation" value="org.openmrs.module.vdot.calculation.EligibleForVdotProgramCalculation" />
+        <property name="defaultEnrollmentForm" ref="vdot.form.vdotClientEnrollment"  />
+        <property name="defaultCompletionForm" ref="vdot.form.vdotClientDiscontinuation" />
+        <property name="patientForms">
+            <set>
+                <ref bean="vdot.form.vdotClientEnrollment" />
+            </set>
+        </property>
+        <property name="fragments">
+            <map>
+                <entry key="enrollment-summary" value="vdot:program/vdot/vdotEnrollmentSummary"/>
+                <entry key="care-panel" value="vdot:program/vdot/vdotCarePanel"/>
+                <entry key="completion-summary" value="vdot:program/vdot/vdotCompletionSummary"/>
+            </map>
+        </property>
+        <property name="order" value="800" />
+
+
+    </bean>
+
+    <!-- Vdot enrollment form -->
+    <bean id="vdot.form.vdotClientEnrollment" class="org.openmrs.module.kenyacore.form.FormDescriptor">
+        <property name="targetUuid" value="197c6ff4-059d-4440-9693-a4bc7520c7b4" />
+        <property name="apps">
+            <set>
+                <ref bean="kenyaemr.app.registration" />
+                <ref bean="kenyaemr.app.clinician" />
+                <ref bean="kenyaemr.app.chart" />
+                <ref bean="kenyaemr.app.hts" />
+            </set>
+        </property>
+        <property name="icon" value="kenyaui:forms/generic.png" />
+        <property name="htmlform" value="vdot:vdotClientEnrollment.html" />
+        <property name="order" value="231018" />
+    </bean>
+
+    <!--VDOT Completion -->
+    <bean id="vdot.form.vdotClientDiscontinuation" class="org.openmrs.module.kenyacore.form.FormDescriptor">
+        <property name="targetUuid" value="967ed26f-2c4d-4cf4-9f49-1c27a8461756" />
+        <property name="apps">
+            <set>
+                <ref bean="kenyaemr.app.registration" />
+                <ref bean="kenyaemr.app.intake" />
+                <ref bean="kenyaemr.app.clinician" />
+                <ref bean="kenyaemr.app.chart" />
+            </set>
+        </property>
+        <property name="icon" value="kenyaui:forms/completion.png" />
+        <property name="htmlform" value="vdot:vdotClientDiscontinuation.html" />
+    </bean>
+
+
 </beans>
