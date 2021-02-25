@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Controller for Kp care summary
+ * Controller for Vdot care summary
  */
 public class VdotCarePanelFragmentController {
 	

@@ -41,6 +41,8 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		
 		public static final String VDOT_CLIENT_DISCONTINUATION = "90e54c41-da23-4ace-b472-0c8521c97594";
 		
+		public static final String EXAMPLE = "d69dedbd-3933-4e44-8292-bea939ce980a";
+		
 	}
 	
 	public static final class _Form {
@@ -48,6 +50,8 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		public static final String VDOT_ENROLLMENT = "197c6ff4-059d-4440-9693-a4bc7520c7b4";
 		
 		public static final String VDOT_COMPLETION = "967ed26f-2c4d-4cf4-9f49-1c27a8461756";
+		
+		public static final String EXAMPLE = "b694b1bc-2086-47dd-a4ad-ba48f9471e4b";
 		
 	}
 	
@@ -66,14 +70,20 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		install(encounterType("Vdot Discontinuation", "Vdot Discontinuation Encounter",
 		    _EncounterType.VDOT_CLIENT_DISCONTINUATION));
 		
+		install(encounterType("Example encounter", "Just an example", _EncounterType.EXAMPLE));
+		
 		// Installing forms
 		
-		install(form("Vdot Enrollment form", null, _EncounterType.VDOT_CLIENT_ENROLLMENT, "1", _Form.VDOT_ENROLLMENT));
-		install(form("Vdot Completion form", null, _EncounterType.VDOT_CLIENT_DISCONTINUATION, "1", _Form.VDOT_COMPLETION));
+		install(form("Vdot Enrollment form", "Vdot Enrollment Form", _EncounterType.VDOT_CLIENT_ENROLLMENT, "1",
+		    _Form.VDOT_ENROLLMENT));
+		install(form("Vdot Discontinuation form", "Vdot Discontinuation Form", _EncounterType.VDOT_CLIENT_DISCONTINUATION,
+		    "1", _Form.VDOT_COMPLETION));
+		
+		install(form("Example form", null, _EncounterType.EXAMPLE, "1", _Form.EXAMPLE));
 		
 		//Installing program
 		
-		install(program("Vdot program", "Program for VDOT clients", vdot_concept, _Program.VDOT_PROGRAM));
+		install(program("Nimeconfirm", "Program for VDOT clients", vdot_concept, _Program.VDOT_PROGRAM));
 		
 	}
 }
