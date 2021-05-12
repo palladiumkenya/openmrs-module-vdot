@@ -40,7 +40,7 @@
 		<reportingVersion>0.9.8.1</reportingVersion>
 		<serializationxstreamVersion>0.2.7</serializationxstreamVersion>
 		<uiframeworkVersion>3.3.1</uiframeworkVersion>
-		<kenyacoreVersion>2.2</kenyacoreVersion>
+		<kenyacoreVersion>2.4.2</kenyacoreVersion>
 		<kenyauiVersion>2.0.3</kenyauiVersion>
 		<kenyaemrVersion>17.0.3</kenyaemrVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
@@ -48,8 +48,11 @@
 		<jacksonVersion>2.10.1</jacksonVersion>
 		<jsonPathVersion>0.8.1</jsonPathVersion>
 		<apacheHttpClientVersion>4.5.10</apacheHttpClientVersion>
-		<webservicesRestVersion>2.1</webservicesRestVersion>
+		<webservices.restVersion>2.11</webservices.restVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+
+
 
 	</properties>
 	<dependencyManagement>
