@@ -9,19 +9,14 @@
  */
 package org.openmrs.module.vdot.metadata;
 
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.metadatadeploy.bundle.AbstractMetadataBundle;
 import org.springframework.stereotype.Component;
 
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.encounterType;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.form;
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.patientIdentifierType;
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.program;
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.relationshipType;
-import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.personAttributeType;
 import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.globalProperty;
+import static org.openmrs.module.metadatadeploy.bundle.CoreConstructors.program;
 
 /**
  * Vdot metadata bundle
@@ -35,7 +30,9 @@ public class VdotMetadata extends AbstractMetadataBundle {
 	
 	public static final String VDOT_LOGIN_URL = "vdot.login_url";
 	
-	public static final String VDOT_POST_PATIENT_URL = "vdot.server_url";
+	public static final String VDOT_ENROLLMENT_POST_API = "vdot.enrollment_post_api";
+	
+	public static final String VDOT_OBSERVATION_GET_API = "vdot.observations_get_api";
 	
 	public static final String VDOT_USER = "vdot.login_user";
 	
@@ -51,8 +48,6 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		
 		public static final String VDOT_CLIENT_DISCONTINUATION = "90e54c41-da23-4ace-b472-0c8521c97594";
 		
-		public static final String EXAMPLE = "d69dedbd-3933-4e44-8292-bea939ce980a";
-		
 	}
 	
 	public static final class _Form {
@@ -60,8 +55,6 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		public static final String VDOT_ENROLLMENT = "197c6ff4-059d-4440-9693-a4bc7520c7b4";
 		
 		public static final String VDOT_COMPLETION = "967ed26f-2c4d-4cf4-9f49-1c27a8461756";
-		
-		public static final String EXAMPLE = "b694b1bc-2086-47dd-a4ad-ba48f9471e4b";
 		
 	}
 	
@@ -80,8 +73,6 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		install(encounterType("Vdot Discontinuation", "Vdot Discontinuation Encounter",
 		    _EncounterType.VDOT_CLIENT_DISCONTINUATION));
 		
-		install(encounterType("Example encounter", "Just an example", _EncounterType.EXAMPLE));
-		
 		// Installing forms
 		
 		install(form("Vdot Enrollment form", "Vdot Enrollment Form", _EncounterType.VDOT_CLIENT_ENROLLMENT, "1",
@@ -89,16 +80,15 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		install(form("Vdot Discontinuation form", "Vdot Discontinuation Form", _EncounterType.VDOT_CLIENT_DISCONTINUATION,
 		    "1", _Form.VDOT_COMPLETION));
 		
-		install(form("Example form", null, _EncounterType.EXAMPLE, "1", _Form.EXAMPLE));
-		
 		//Installing program
 		
-		install(program("Nimeconfirm", "Program for VDOT clients", vdot_concept, _Program.VDOT_PROGRAM));
+		install(program("NimeCONFIRM", "Program for NimeCONFIRM clients", vdot_concept, _Program.VDOT_PROGRAM));
 		
 		install(globalProperty(VDOT_LOGIN_URL, "Vdot login url", null));
 		install(globalProperty(VDOT_USER, "Vdot user", null));
 		install(globalProperty(VDOT_PWD, "Vdot pwd", null));
-		install(globalProperty(VDOT_POST_PATIENT_URL, "Vdot post url", null));
+		install(globalProperty(VDOT_ENROLLMENT_POST_API, "Vdot endpoint for posting enrollment information", null));
+		install(globalProperty(VDOT_OBSERVATION_GET_API, "Vdot endpoint for getting video observations", null));
 		install(globalProperty(VDOT_LAST_PATIENT_ENTRY, "Vdot last patient entry id", null));
 		
 	}
