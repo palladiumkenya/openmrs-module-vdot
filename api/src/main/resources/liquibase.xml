@@ -35,5 +35,38 @@
         <addForeignKeyConstraint constraintName="vdot_item_owner_fk" baseTableName="vdot_item" baseColumnNames="owner"  referencedTableName="users"
                                  referencedColumnNames="user_id" />
     </changeSet> -->
- 
+
+
+
+
+    <!--Adding scheduled task to push patient info to vdot system-->
+    <changeSet id="kenyaemr_vdot_001" author="makombe">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.vdot.task.PushPatientInfoToVdotTask'
+                And name = 'Push Patient info to Vdot system'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting processor for pushing patient info to vdot system into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="Push Patient info to Vdot system" />
+            <column name="description" value="Push patient info to the Vdot system" />
+            <column name="schedulable_class" value="org.openmrs.module.vdot.task.PushPatientInfoToVdotTask" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2021-05-10T19:59:59" />
+            <column name="repeat_interval" value="3600" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="1" />
+            <column name="started" value="1" />
+            <column name="uuid" value="1c9ad0a2-b281-11eb-8529-0242ac130003" />
+        </insert>
+    </changeSet>
+
+
+
+
+
+
 </databaseChangeLog>

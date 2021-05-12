@@ -33,6 +33,16 @@ public class VdotMetadata extends AbstractMetadataBundle {
 	
 	private AdministrationService administrationService;
 	
+	public static final String VDOT_LOGIN_URL = "vdot.login_url";
+	
+	public static final String VDOT_POST_PATIENT_URL = "vdot.server_url";
+	
+	public static final String VDOT_USER = "vdot.login_user";
+	
+	public static final String VDOT_PWD = "vdot.login_pwd";
+	
+	public static final String VDOT_LAST_PATIENT_ENTRY = "vdot.lastVdotEnrollment";
+	
 	public static final class _EncounterType {
 		
 		public static final String VDOT_ENCOUNTER = "d7aaaf20-31ca-4d22-9dd9-0796eb47a341";

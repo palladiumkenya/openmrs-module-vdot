@@ -32,7 +32,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Vdot program eligibility calculation. Eligibility criteria: Viral load > 1000 copies/ml and age between 0 and 19 years
+ * Vdot program eligibility calculation. Eligibility criteria: Viral load > 1000 copies/ml and age
+ * between 0 and 19 years
  */
 public class EligibleForVdotProgramCalculation extends AbstractPatientCalculation implements PatientCalculation {
 	
