@@ -55,7 +55,7 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			GlobalProperty gpLoginPwd = Context.getAdministrationService().getGlobalPropertyObject(VdotMetadata.VDOT_PWD);
 			
 			GlobalProperty gpPostVdotUrl = Context.getAdministrationService().getGlobalPropertyObject(
-			    VdotMetadata.VDOT_POST_PATIENT_URL);
+			    VdotMetadata.VDOT_ENROLLMENT_POST_API);
 			
 			String loginUrl = gpLoginUrl.getPropertyValue();
 			String user = gpLoginUser.getPropertyValue();

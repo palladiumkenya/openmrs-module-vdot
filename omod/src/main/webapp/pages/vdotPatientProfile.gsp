@@ -8,7 +8,7 @@
         <tr>
             <td width="30%" valign="top">
                 ${ ui.includeFragment("kenyaemr", "patient/patientSummary", [ patient: currentPatient ]) }
-                ${ ui.includeFragment("kenyaemr", "patient/patientRelationships", [ patient: currentPatient ]) }
+                ${ ui.includeFragment("vdot", "vdotPillCalendar", [ patient: currentPatient ]) }
             </td>
             <td width="55%" valign="top" style="padding-left: 5px">
                 ${ui.includeFragment("vdot", "vdotPatientObservations", [patient: currentPatient])}

@@ -2,7 +2,7 @@
     ui.decorateWith("kenyaemr", "standardPage", [ layout: "sidebar" ])
 
     def menuItems = [
-            [label: "Synchronize data", iconProvider: "vdot", icon: "buttons/contact_tree.png", label: "Synchronize data", href: ui.pageLink("vdot", "dataManagement")]
+            [label: "Synchronize data", iconProvider: "vdot", icon: "icons/Nimeconfirm_sync_38_3.png", label: "Synchronize data", href: ui.pageLink("vdot", "dataManagement")]
     ]
 
 %>
