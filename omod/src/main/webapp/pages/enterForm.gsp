@@ -4,7 +4,7 @@
 	def defaultEncounterDate = currentVisit ? currentVisit.startDatetime : new Date()
 %>
 <div class="ke-page-content">
-	${ ui.includeFragment("vdot", "form/enterHtmlForm", [
+	${ ui.includeFragment("kenyakeypop", "form/enterHtmlForm", [
 			patient: currentPatient,
 			formUuid: formUuid,
 			visit: currentVisit,

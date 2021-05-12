@@ -25,6 +25,15 @@
 
     <context:component-scan base-package="org.openmrs.module.vdot" />
 
+    <!--App descriptor-->
+    	<bean id="vdot.app.vdot" factory-bean="kenyacore.appFactoryBean" factory-method="createInstance">
+		<constructor-arg value="vdot.vdot" />
+		<constructor-arg value="nimeconfirm" />
+		<constructor-arg value="vdot/vdotHomePage.page" />
+		<constructor-arg value="vdot:images/apps/vdot.png" />
+		<constructor-arg value="1000" />
+	</bean>
+
     <!-- Wraps VdotService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
     <bean id="vdot.VdotService"
