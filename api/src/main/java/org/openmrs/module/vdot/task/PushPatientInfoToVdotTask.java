@@ -75,10 +75,10 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			        + "join program pr on pr.program_id = pp.program_id\n"
 			        + "where voided=0 and pr.uuid =\"b2b2dd4a-3aa5-4c98-93ad-4970b06819ef\";";
 			List<List<Object>> lastVdotEnrollment = Context.getAdministrationService().executeSQL(sql, true);
-
+			
 			Integer lastPatientId = (Integer) lastVdotEnrollment.get(0).get(0);
 			lastPatientId = lastPatientId != null ? lastPatientId : 0;
-
+			
 			VdotDataExchange e = new VdotDataExchange();
 			ObjectNode payload = e.generatePayloadForVdot(Context.getPatientService().getPatient(lastPatientId));
 			boolean successful = false;

@@ -87,8 +87,10 @@ public class VdotDataExchange {
 			payload.put("sex", patient.getGender());
 			payload.put("date_started_art", originalRegimenEncounter != null ? Utils.getSimpleDateFormat("yyyy-MM-dd")
 			        .format(originalRegimenEncounter.getEncounterDatetime()) : "");
-			payload.put("date_initiated_on_current_regimen", currentRegimenEncounter != null ? Utils.getSimpleDateFormat("yyyy-MM-dd")
-			        .format(currentRegimenEncounter.getEncounterDatetime()) : "");
+			payload.put(
+			    "date_initiated_on_current_regimen",
+			    currentRegimenEncounter != null ? Utils.getSimpleDateFormat("yyyy-MM-dd").format(
+			        currentRegimenEncounter.getEncounterDatetime()) : "");
 		}
 		return payload;
 	}
