@@ -1,9 +1,6 @@
 <%
     ui.decorateWith("kenyaemr", "standardPage", [ patient: currentPatient ])
 
-    def onEncounterClick = { encounter ->
-        """kenyaemr.openEncounterDialog('${ currentApp.id }', ${ encounter.id });"""
-    }
 %>
 
 <div class="ke-page-content">
@@ -13,13 +10,8 @@
                 ${ ui.includeFragment("kenyaemr", "patient/patientSummary", [ patient: currentPatient ]) }
                 ${ ui.includeFragment("kenyaemr", "patient/patientRelationships", [ patient: currentPatient ]) }
             </td>
-            <td width="55%" valign="top" style="padding-left: 5px">m
-                ${ ui.includeFragment("kenyaemr", "visitMenu", [ patient: currentPatient, visit: activeVisit ]) }
-                ${ ui.includeFragment("knh", "appointmentRescheduling/appointmentsHistory", [ patient: currentPatient]) }
-                ${ui.includeFragment("vdot", "form/vdotPatientObs", [patient: currentPatient])}
-            </td>
-            <td width="15%" valign="top" style="padding-left: 5px">
-                ${ ui.includeFragment("kenyaemr", "providerAction/providerActions") }
+            <td width="55%" valign="top" style="padding-left: 5px">
+                ${ui.includeFragment("vdot", "vdotPatientObservations", [patient: currentPatient])}
             </td>
         </tr>
     </table>

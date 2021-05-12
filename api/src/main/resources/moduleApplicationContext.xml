@@ -25,14 +25,6 @@
 
     <context:component-scan base-package="org.openmrs.module.vdot" />
 
-    <!--App descriptor-->
-    	<bean id="vdot.app.vdot" factory-bean="kenyacore.appFactoryBean" factory-method="createInstance">
-		<constructor-arg value="vdot.vdot" />
-		<constructor-arg value="nimeconfirm" />
-		<constructor-arg value="vdot/vdotHomePage.page" />
-		<constructor-arg value="vdot:images/apps/vdot.png" />
-		<constructor-arg value="1000" />
-	</bean>
 
     <!-- Wraps VdotService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
@@ -100,7 +92,7 @@
     <bean id="vdot.config.form" class="org.openmrs.module.kenyacore.form.FormConfiguration">
         <property name="commonVisitForms">
             <set>
-                <ref bean="vdot.form.example" />
+
              </set>
         </property>
     </bean>
@@ -136,17 +128,14 @@
     </bean>
 
     <!-- Forms addition -->
-    <bean id="vdot.form.example" class="org.openmrs.module.kenyacore.form.FormDescriptor">
-        <property name="targetUuid" value="b694b1bc-2086-47dd-a4ad-ba48f9471e4b" />
-        <property name="apps">
-            <set>
-                <ref bean="kenyaemr.app.clinician" />
-                <ref bean="kenyaemr.app.chart" />
-            </set>
-        </property>
-        <property name="icon" value="kenyaui:forms/generic.png" />
-        <property name="htmlform" value="vdot:example.html" />
-    </bean>
 
+    <!--App descriptor-->
+    <bean id="vdot.app.vdot" factory-bean="kenyacore.appFactoryBean" factory-method="createInstance">
+        <constructor-arg value="vdot.vdot" />
+        <constructor-arg value="NimeCONFIRM" />
+        <constructor-arg value="vdot/vdotHome.page" />
+        <constructor-arg value="vdot:apps/Nimeconfirm_105px_73px.png" />
+        <constructor-arg value="1000" />
+    </bean>
 
 </beans>
