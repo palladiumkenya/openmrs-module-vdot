@@ -95,5 +95,11 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		
 		install(program("Nimeconfirm", "Program for VDOT clients", vdot_concept, _Program.VDOT_PROGRAM));
 		
+		install(globalProperty(VDOT_LOGIN_URL, "Vdot login url", null));
+		install(globalProperty(VDOT_USER, "Vdot user", null));
+		install(globalProperty(VDOT_PWD, "Vdot pwd", null));
+		install(globalProperty(VDOT_POST_PATIENT_URL, "Vdot post url", null));
+		install(globalProperty(VDOT_LAST_PATIENT_ENTRY, "Vdot last patient entry id", null));
+		
 	}
 }
