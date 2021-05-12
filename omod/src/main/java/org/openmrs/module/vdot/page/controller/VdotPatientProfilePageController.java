@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.vdot.page.controller.vdot;
+package org.openmrs.module.vdot.page.controller;
 
 import org.openmrs.Patient;
 import org.openmrs.Visit;
@@ -23,7 +23,7 @@ import java.util.List;
  * Patient Profile pages controller
  */
 @AppPage(VdotConstants.APP_VDOT)
-public class PatientProfilePageController {
+public class VdotPatientProfilePageController {
 	
 	public void controller(@RequestParam("patientId") Patient patient, PageModel model) {
 	}

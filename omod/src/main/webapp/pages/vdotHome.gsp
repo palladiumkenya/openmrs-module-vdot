@@ -1,0 +1,26 @@
+<%
+    ui.decorateWith("kenyaemr", "standardPage", [ layout: "sidebar" ])
+
+    def menuItems = [
+            [label: "Synchronize data", iconProvider: "vdot", icon: "buttons/contact_tree.png", label: "Synchronize data", href: ui.pageLink("vdot", "dataManagement")]
+    ]
+
+%>
+
+<div class="ke-page-sidebar">
+    ${ ui.includeFragment("kenyaemr", "patient/patientSearchForm", [ defaultWhich: "all" ]) }
+
+    <div class="ke-panel-frame">
+        ${ui.includeFragment("kenyaui", "widget/panelMenu", [heading: "Data Management Actions", items: menuItems])}
+    </div>
+</div>
+
+<div class="ke-page-content">
+    ${ ui.includeFragment("kenyaemr", "patient/patientSearchResults", [ pageProvider: "vdot", page: "vdotPatientProfile" ]) }
+</div>
+
+<script type="text/javascript">
+    jQuery(function() {
+        jQuery('input[name="query"]').focus();
+    });
+</script>

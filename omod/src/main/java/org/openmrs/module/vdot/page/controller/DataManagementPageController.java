@@ -12,7 +12,7 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.vdot.page.controller.vdot;
+package org.openmrs.module.vdot.page.controller;
 
 import org.openmrs.Patient;
 import org.openmrs.module.kenyaui.annotation.AppPage;
@@ -25,10 +25,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Home pages controller
  */
 @AppPage(VdotConstants.APP_VDOT)
-public class VdotHomePageController {
+public class DataManagementPageController {
 	
-	public void controller(@RequestParam(required = false, value = "patientId") Patient patient, PageModel model, UiUtils ui) {
+	public void controller() {
 		
-		model.addAttribute("patient", patient);
 	}
 }
