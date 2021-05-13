@@ -7,12 +7,12 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.vdot.api.;
+package org.openmrs.module.vdot.api;
 
 /**
  * This is a unit test, which verifies logic in NimeconfirmService. It doesn't extend
  * BaseModuleContextSensitiveTest, thus it is run without the in-memory DB and Spring context.
  */
-public class VdotServiceTest {
+public class NimeconfirmServiceTest {
 	
 }

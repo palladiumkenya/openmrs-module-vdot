@@ -24,10 +24,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.vdot.api.model.NimeconfirmEnrolment;
+import org.openmrs.module.vdot.api.NimeconfirmService;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,8 @@ import java.util.Map;
  */
 public class PushPatientInfoToVdotTask extends AbstractTask {
 	
+	NimeconfirmService nimeconfirmService;
+
 	private Log log = LogFactory.getLog(PushPatientInfoToVdotTask.class);
 	
 	/**
@@ -62,6 +67,7 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			String pwd = gpLoginPwd.getPropertyValue();
 			
 			String serverUrl = gpPostVdotUrl.getPropertyValue();
+			
 			if (StringUtils.isBlank(loginUrl) || StringUtils.isBlank(user) || StringUtils.isBlank(pwd)
 			        || StringUtils.isBlank(serverUrl)) {
 				System.out.println("No credentials for posting patient info to vdot application");
@@ -80,10 +86,15 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			
 			VdotDataExchange e = new VdotDataExchange();
 			ObjectNode payload = e.generatePayloadForVdot(Context.getPatientService().getPatient(lastPatientId));
+			Date date = new Date();
 			boolean successful = false;
 			CloseableHttpClient loginClient = HttpClients.createDefault();
 			String token = null;
 			
+			NimeconfirmEnrolment outMsg = new NimeconfirmEnrolment(Context.getPatientService().getPatient(lastPatientId),
+			        payload.toString(), "Pending", date);
+			nimeconfirmService.saveNimeconfirmEnrolment(outMsg);
+
 			JsonNodeFactory factory = JsonNodeFactory.instance;
 			try {
 				//Define a postRequest request
