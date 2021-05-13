@@ -11,18 +11,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class IntegerToNimeconfirmEnrolmentConverter implements Converter<Integer, NimeconfirmEnrolment> {
-
-    /**
-     * @see Converter#convert(Object)
-     */
-    @Override
-    public NimeconfirmEnrolment convert(Integer id) {
-        NimeconfirmService service = Context.getService(NimeconfirmService.class);
-        if (id == null) {
-            return null;
-        } else {
-            return service.getNimeconfirmEnrolmentByID(id);
-        }
-
-    }
+	
+	/**
+	 * @see Converter#convert(Object)
+	 */
+	@Override
+	public NimeconfirmEnrolment convert(Integer id) {
+		NimeconfirmService service = Context.getService(NimeconfirmService.class);
+		if (id == null) {
+			return null;
+		} else {
+			return service.getNimeconfirmEnrolmentByID(id);
+		}
+		
+	}
 }

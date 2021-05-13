@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StringToNimeconfirmEnrolmentConverter implements Converter<String, NimeconfirmEnrolment> {
-
-    /**
-     * @see Converter#convert(Object)
-     */
-    @Override
-    public NimeconfirmEnrolment convert(String source) {
-        if (StringUtils.isEmpty(source)) {
-            return null;
-        }
-
-        return Context.getService(NimeconfirmService.class).getNimeconfirmEnrolmentByID(Integer.valueOf(source));
-    }
+	
+	/**
+	 * @see Converter#convert(Object)
+	 */
+	@Override
+	public NimeconfirmEnrolment convert(String source) {
+		if (StringUtils.isEmpty(source)) {
+			return null;
+		}
+		
+		return Context.getService(NimeconfirmService.class).getNimeconfirmEnrolmentByID(Integer.valueOf(source));
+	}
 }

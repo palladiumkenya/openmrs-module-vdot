@@ -9,20 +9,20 @@ import org.springframework.stereotype.Component;
 /**
  * Created by Palladium Dev on 13 May, 2021
  */
-    @Component
-    public class IntegerToNimeconfirmVideoObsConverter implements Converter<Integer, NimeconfirmVideoObs> {
-
-        /**
-         * @see Converter#convert(Object)
-         */
-        @Override
-        public NimeconfirmVideoObs convert(Integer id) {
-            NimeconfirmService service = Context.getService(NimeconfirmService.class);
-            if (id == null) {
-                return null;
-            } else {
-                return service.getNimeconfirmVideoObsByID(id);
-            }
-
-        }
-    }
+@Component
+public class IntegerToNimeconfirmVideoObsConverter implements Converter<Integer, NimeconfirmVideoObs> {
+	
+	/**
+	 * @see Converter#convert(Object)
+	 */
+	@Override
+	public NimeconfirmVideoObs convert(Integer id) {
+		NimeconfirmService service = Context.getService(NimeconfirmService.class);
+		if (id == null) {
+			return null;
+		} else {
+			return service.getNimeconfirmVideoObsByID(id);
+		}
+		
+	}
+}
