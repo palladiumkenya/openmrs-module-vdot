@@ -26,18 +26,18 @@
     <context:component-scan base-package="org.openmrs.module.vdot" />
 
 
-    <!-- Wraps VdotService methods in DB transactions and OpenMRS interceptors,
+    <!-- Wraps NimeconfirmService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
-    <bean id="vdot.VdotService"
+    <bean id="vdot.NimeconfirmService"
             class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager" />
         </property>
         <property name="target">
-            <bean class="org.openmrs.module.vdot.api.impl.VdotServiceImpl">
+            <bean class="org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl">
                 <property name="dao" >
 
-                <bean class="org.openmrs.module.vdot.api.dao.VdotDao">
+                <bean class="org.openmrs.module.vdot.api.db.hibernate.NimeconfirmDao">
                     <property name="sessionFactory">
                         <ref bean="sessionFactory" />
 
@@ -54,13 +54,13 @@
         </property>
     </bean>
 
-    <!-- Adds VdotService to OpenMRS context so it can be accessed
-    calling Context.getService(VdotService.class) -->
+    <!-- Adds NimeconfirmService to OpenMRS context so it can be accessed
+    calling Context.getService(NimeconfirmService.class) -->
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.openmrs.module.vdot.api.VdotService</value>
-                <ref bean="vdot.VdotService" />
+                <value>org.openmrs.module.vdot.api.NimeconfirmService</value>
+                <ref bean="vdot.NimeconfirmService" />
             </list>
         </property>
     </bean>
