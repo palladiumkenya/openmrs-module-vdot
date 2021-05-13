@@ -9,6 +9,8 @@
 	<bean class="org.openmrs.ui.framework.StandardModuleUiConfiguration">
 		<property name="moduleId" value="vdot"/>
 	</bean>
+	<bean class="org.openmrs.module.vdot.converter.IntegerToNimeconfirmEnrolmentConverter"/>
+	<bean class="org.openmrs.module.vdot.converter.IntegerToNimeconfirmVideoObsConverter"/>
 
 
 

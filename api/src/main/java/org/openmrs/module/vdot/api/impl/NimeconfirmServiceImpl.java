@@ -32,7 +32,7 @@ public class NimeconfirmServiceImpl extends BaseOpenmrsService implements Nimeco
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
-	public void setDao(NimeconfirmDao dao) {
+	public void setNimeconfirmDao(NimeconfirmDao nimeconfirmDao) {
 		this.nimeconfirmDao = nimeconfirmDao;
 	}
 	

@@ -35,7 +35,7 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl">
-                <property name="dao" >
+                <property name="NimeconfirmDao" >
 
                 <bean class="org.openmrs.module.vdot.api.db.hibernate.NimeconfirmDao">
                     <property name="sessionFactory">
