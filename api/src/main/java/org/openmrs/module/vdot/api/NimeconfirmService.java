@@ -11,9 +11,6 @@ package org.openmrs.module.vdot.api;
 
 import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.vdot.api.model.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.model.NimeconfirmVideoObs;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
