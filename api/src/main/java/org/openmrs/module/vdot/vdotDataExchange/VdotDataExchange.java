@@ -1,5 +1,10 @@
 package org.openmrs.module.vdot.vdotDataExchange;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+//import org.codehaus.jackson.map.ObjectMapper;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -26,6 +31,7 @@ import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -109,7 +115,6 @@ public class VdotDataExchange {
 		if (StringUtils.isNotBlank(regimenName)) {
 			nascopCode = RegimenMappingUtils.getDrugNascopCodeByDrugNameAndRegimenLine(regimenName, regimenLine);
 		}
-		
 		//add to list only if enrolled into vdot program
 		if (programs.size() > 0) {
 			
@@ -130,7 +135,7 @@ public class VdotDataExchange {
 			payload.put("frequency", frequency);
 			//payload.put("morningIntakeTime", ""); // not collected in the emr
 			//payload.put("eveningIntakeTime", ""); // not collected in the emr
-			payload.put("countyCode", address.get("COUNTY").textValue());
+			payload.put("countyCode", getCountyCodes(address.get("COUNTY").textValue().toLowerCase()));
 			payload.put("subcounty", address.get("SUB_COUNTY").textValue());
 			payload.put("gender", patient.getGender());
 			
@@ -138,6 +143,77 @@ public class VdotDataExchange {
 		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		
 		return payload;
+	}
+	
+	private String getCountyCodes(String name) {
+		
+		String json = "{\"counties\":[\n" + "  {\n" + "    \"County\": \"Mombasa\",\n" + "    \"Code\": 1\n" + "  },\n"
+		        + "  {\n" + "    \"County\": \"Kwale\",\n" + "    \"Code\": 2\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kilifi\",\n" + "    \"Code\": 3\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Tana River\",\n" + "    \"Code\": 4\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Lamu\",\n" + "    \"Code\": 5\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Taita-Taveta\",\n" + "    \"Code\": 6\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Garissa\",\n" + "    \"Code\": 7\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Wajir\",\n" + "    \"Code\": 8\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Mandera\",\n" + "    \"Code\": 9\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Marsabit\",\n" + "    \"Code\": 10\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Isiolo\",\n" + "    \"Code\": 11\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Meru\",\n" + "    \"Code\": 12\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Tharaka-Nithi\",\n" + "    \"Code\": 13\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Embu\",\n" + "    \"Code\": 14\n" + "  },\n" + "  {\n" + "    \"County\": \"Kitui\",\n"
+		        + "    \"Code\": 15\n" + "  },\n" + "  {\n" + "    \"County\": \"Machakos\",\n" + "    \"Code\": 16\n"
+		        + "  },\n" + "  {\n" + "    \"County\": \"Makueni\",\n" + "    \"Code\": 17\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Nyandarua\",\n" + "    \"Code\": 18\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Nyeri\",\n" + "    \"Code\": 19\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kirinyaga\",\n" + "    \"Code\": 20\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Murang'a\",\n" + "    \"Code\": 21\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kiambu\",\n" + "    \"Code\": 22\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Turkana\",\n" + "    \"Code\": 23\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"West Pokot\",\n" + "    \"Code\": 24\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Samburu\",\n" + "    \"Code\": 25\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Trans-Nzoia\",\n" + "    \"Code\": 26\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Uasin Gishu\",\n" + "    \"Code\": 27\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Elgeyo-Marakwet\",\n" + "    \"Code\": 28\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Nandi\",\n" + "    \"Code\": 29\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Baringo\",\n" + "    \"Code\": 30\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Laikipia\",\n" + "    \"Code\": 31\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Nakuru\",\n" + "    \"Code\": 32\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Narok\",\n" + "    \"Code\": 33\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kajiado\",\n" + "    \"Code\": 34\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kericho\",\n" + "    \"Code\": 35\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Bomet\",\n" + "    \"Code\": 36\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kakamega\",\n" + "    \"Code\": 37\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Vihiga\",\n" + "    \"Code\": 38\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Bungoma\",\n" + "    \"Code\": 39\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Busia\",\n" + "    \"Code\": 40\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Siaya\",\n" + "    \"Code\": 41\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kisumu\",\n" + "    \"Code\": 42\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Homa Bay\",\n" + "    \"Code\": 43\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Migori\",\n" + "    \"Code\": 44\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Kisii\",\n" + "    \"Code\": 45\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Nyamira\",\n" + "    \"Code\": 46\n" + "  },\n" + "  {\n"
+		        + "    \"County\": \"Nairobi\",\n" + "    \"Code\": 47\n" + "  }\n" + "]\n" + "}";
+		
+		ObjectMapper mapper = new ObjectMapper(); //using jackson
+		JsonNode jsonNode = null;
+		String countyName = "";
+		String countyCode = "";
+		try {
+			jsonNode = mapper.readTree(json);
+			ArrayNode arrayNode = (ArrayNode) jsonNode.get("counties");
+			for (int i = 0; i < arrayNode.size(); i++) {
+				countyName = arrayNode.get(i).get("County").toString().toLowerCase().replace("\"", "");
+				if (StringUtils.isNotBlank(countyName) && countyName.equals(name)) {
+					countyCode = arrayNode.get(i).get("Code").toString();
+					break;
+				}
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return countyCode;
 	}
 	
 }
