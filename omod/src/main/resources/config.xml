@@ -103,6 +103,13 @@
 		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
+
+	<mappingFiles>
+
+		NimeconfirmEnrolment.hbm.xml
+		NimeconfirmVideoObs.hbm.xml
+
+	</mappingFiles>
 	
 </module>
 
