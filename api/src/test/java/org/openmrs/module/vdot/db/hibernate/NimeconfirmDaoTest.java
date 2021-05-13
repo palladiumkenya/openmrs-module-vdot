@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.vdot.api.dao;
+package org.openmrs.module.vdot.api.db;
 
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
@@ -17,6 +17,6 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
  * standardTestDataset.xml in openmrs-api. All test methods are executed in transactions, which are
  * rolled back by the end of each test method.
  */
-public class VdotDaoTest extends BaseModuleContextSensitiveTest {
+public class NimeconfirmDaoTest extends BaseModuleContextSensitiveTest {
 	
 }
