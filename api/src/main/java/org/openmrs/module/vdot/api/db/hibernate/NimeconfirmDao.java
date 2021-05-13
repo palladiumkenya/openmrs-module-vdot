@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.vdot.api.dao;
+package org.openmrs.module.vdot.api.db.hibernate;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
@@ -15,8 +15,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.module.vdot.api.model.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.model.NimeconfirmVideoObs;
+import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
+import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
+import org.openmrs.module.vdot.api.dao.INimeconfirmDao;
 
 import java.util.List;
 

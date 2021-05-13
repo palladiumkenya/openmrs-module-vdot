@@ -15,8 +15,8 @@ import org.openmrs.Patient;
 import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.vdot.api.db.hibernate.NimeconfirmDao;
-import org.openmrs.module.vdot.api.model.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.model.NimeconfirmVideoObs;
+import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
+import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.NimeconfirmService;
 
 import java.util.List;

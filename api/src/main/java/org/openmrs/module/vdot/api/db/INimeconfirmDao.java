@@ -1,8 +1,8 @@
 package org.openmrs.module.vdot.api.dao;
 
 import org.openmrs.Patient;
-import org.openmrs.module.vdot.api.model.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.model.NimeconfirmVideoObs;
+import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
+import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 
 import java.util.List;
 

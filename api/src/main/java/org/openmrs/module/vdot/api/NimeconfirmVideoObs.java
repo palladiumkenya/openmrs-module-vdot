@@ -1,4 +1,4 @@
-package org.openmrs.module.vdot.api.model;
+package org.openmrs.module.vdot.api;
 
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Patient;
