@@ -24,7 +24,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.vdot.api.model.NimeconfirmEnrolment;
+import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmService;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
@@ -40,7 +40,7 @@ import java.util.Map;
 public class PushPatientInfoToVdotTask extends AbstractTask {
 	
 	NimeconfirmService nimeconfirmService;
-
+	
 	private Log log = LogFactory.getLog(PushPatientInfoToVdotTask.class);
 	
 	/**
@@ -94,7 +94,7 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			NimeconfirmEnrolment outMsg = new NimeconfirmEnrolment(Context.getPatientService().getPatient(lastPatientId),
 			        payload.toString(), "Pending", date);
 			nimeconfirmService.saveNimeconfirmEnrolment(outMsg);
-
+			
 			JsonNodeFactory factory = JsonNodeFactory.instance;
 			try {
 				//Define a postRequest request
