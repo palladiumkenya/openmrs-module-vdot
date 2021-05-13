@@ -62,7 +62,6 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			String pwd = gpLoginPwd.getPropertyValue();
 			
 			String serverUrl = gpPostVdotUrl.getPropertyValue();
-			
 			if (StringUtils.isBlank(loginUrl) || StringUtils.isBlank(user) || StringUtils.isBlank(pwd)
 			        || StringUtils.isBlank(serverUrl)) {
 				System.out.println("No credentials for posting patient info to vdot application");

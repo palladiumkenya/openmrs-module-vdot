@@ -9,8 +9,17 @@ import org.openmrs.Program;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Encounter;
+import org.openmrs.Order;
+import org.openmrs.DrugOrder;
+import org.openmrs.util.PrivilegeConstants;
+import org.openmrs.calculation.result.CalculationResult;
+
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.kenyaemr.calculation.EmrCalculationUtils;
+import org.openmrs.module.kenyaemr.calculation.library.hiv.art.LastViralLoadResultCalculation;
+
 import org.openmrs.module.kenyacore.RegimenMappingUtils;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
@@ -18,6 +27,7 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.util.List;
+import java.util.Locale;
 
 public class VdotDataExchange {
 	
@@ -27,29 +37,58 @@ public class VdotDataExchange {
 	
 	ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
 	
+	public static final Locale LOCALE = Locale.ENGLISH;
+	
 	/**
 	 * Returns a single object details for patients enrolled in VDOT program
 	 * 
 	 * @return
 	 */
 	public ObjectNode generatePayloadForVdot(Patient patient) {
+		Context.addProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
+		EncounterService encounterService = Context.getEncounterService();
+		
 		ObjectNode payload = Utils.getJsonNodeFactory().objectNode();
 		
 		String dob = patient.getBirthdate() != null ? Utils.getSimpleDateFormat("yyyy-MM-dd").format(patient.getBirthdate())
 		        : "";
 		
-		String fullName = "";
+		// get last drug regimen encounter
 		
-		if (patient.getGivenName() != null) {
-			fullName += patient.getGivenName();
+		StringBuilder q = new StringBuilder();
+		q.append("select max(e.encounter_id)");
+		q.append("from encounter e inner join \n"
+		        + "( select encounter_type_id, uuid, name from encounter_type where uuid ='7df67b83-1b84-4fe2-b1b7-794b4e9bfcc3'\n"
+		        + ") et on et.encounter_type_id=e.encounter_type\n"
+		        + "inner join orders o on o.encounter_id=e.encounter_id and o.voided=0 and o.order_action='NEW' and o.date_stopped is null and o.order_group_id is not null "
+		
+		);
+		q.append("where e.patient_id = " + patient.getPatientId());
+		
+		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
+		Integer encounterId = (Integer) queryData.get(0).get(0);
+		Encounter lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
+		String frequency = "";
+		
+		if (lastDrugOrderEncounter != null) {
+			for (Order order : lastDrugOrderEncounter.getOrders()) {
+				if (order != null) {
+					
+					DrugOrder drugOrder = (DrugOrder) order;
+					if (drugOrder.getFrequency() != null && drugOrder.getFrequency().getConcept() != null) {
+						frequency = drugOrder.getFrequency().getConcept().getShortNameInLocale(LOCALE) != null ? drugOrder
+						        .getFrequency().getConcept().getShortNameInLocale(LOCALE).getName() : drugOrder
+						        .getFrequency().getConcept().getName().getName();
+					}
+				}
+			}
 		}
 		
-		if (patient.getMiddleName() != null) {
-			fullName += " " + patient.getMiddleName();
-		}
-		
-		if (patient.getFamilyName() != null) {
-			fullName += " " + patient.getFamilyName();
+		CalculationResult lastViralLoad = EmrCalculationUtils.evaluateForPatient(LastViralLoadResultCalculation.class, null,
+		    patient);
+		SimpleObject vl = null;
+		if (!lastViralLoad.isEmpty()) {
+			vl = (SimpleObject) lastViralLoad.getValue();
 		}
 		
 		List<PatientProgram> programs = programWorkflowService.getPatientPrograms(patient, vdotProgram, null, null, null,
@@ -63,6 +102,8 @@ public class VdotDataExchange {
 		String regimenName = (String) regimenDetails.get("regimenShortDisplay");
 		String regimenLine = (String) regimenDetails.get("regimenLine");
 		ObjectNode address = Utils.getPatientAddress(patient);
+		String phoneNumber = Utils.getPatientPhoneNumber(patient);
+		String nextOfKinPhoneNumber = Utils.getPatientNextOfKinPhoneNumber(patient);
 		
 		String nascopCode = "";
 		if (StringUtils.isNotBlank(regimenName)) {
@@ -72,26 +113,30 @@ public class VdotDataExchange {
 		//add to list only if enrolled into vdot program
 		if (programs.size() > 0) {
 			
-			payload.put("facility_enrolled", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
-			payload.put("ccc_number", cccNumber != null ? cccNumber.getIdentifier() : "");
+			payload.put("facilityCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
+			payload.put("cccNo", cccNumber != null ? cccNumber.getIdentifier() : "");
 			payload.put("dob", dob);
-			payload.put("current_regimen", regimenName);
-			payload.put("drug_code", nascopCode != null ? nascopCode : "");
-			payload.put("phone_number", Utils.getPatientPhoneNumber(patient));
-			payload.put("next_of_kin_phone_number", Utils.getPatientNextOfKinPhoneNumber(patient));
-			payload.put("patient_name", fullName);
-			payload.put("last_vl", "");
-			payload.put("last_vl_date", "");
-			payload.put("county", address.get("COUNTY").textValue());
-			payload.put("sub_county", address.get("SUB_COUNTY").textValue());
-			payload.put("sex", patient.getGender());
-			payload.put("date_started_art", originalRegimenEncounter != null ? Utils.getSimpleDateFormat("yyyy-MM-dd")
-			        .format(originalRegimenEncounter.getEncounterDatetime()) : "");
-			payload.put(
-			    "date_initiated_on_current_regimen",
-			    currentRegimenEncounter != null ? Utils.getSimpleDateFormat("yyyy-MM-dd").format(
-			        currentRegimenEncounter.getEncounterDatetime()) : "");
+			payload.put("regimen", regimenName.replace("/", "+"));
+			// payload.put("drug_code", nascopCode != null ? nascopCode : "");
+			payload.put("phoneNumber", phoneNumber != null || StringUtils.isNotBlank(phoneNumber) ? phoneNumber
+			        : nextOfKinPhoneNumber != null ? nextOfKinPhoneNumber : "");
+			payload.put("firstName", patient.getGivenName());
+			payload.put("middleName", patient.getMiddleName());
+			payload.put("surname", patient.getFamilyName());
+			payload.put("currentVl",
+			    vl != null && vl.get("lastVl") != null ? vl.get("lastVl").toString().replace("copies/ml", "") : "");
+			payload.put("lastVlDate", vl != null && vl.get("lastVlDate") != null ? vl.get("lastVlDate").toString() : "");
+			payload.put("on_selfcare", "0");
+			payload.put("frequency", frequency);
+			//payload.put("morningIntakeTime", ""); // not collected in the emr
+			//payload.put("eveningIntakeTime", ""); // not collected in the emr
+			payload.put("countyCode", address.get("COUNTY").textValue());
+			payload.put("subcounty", address.get("SUB_COUNTY").textValue());
+			payload.put("gender", patient.getGender());
+			
 		}
+		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
+		
 		return payload;
 	}
 	

@@ -7,6 +7,8 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonAddress;
 import org.openmrs.Location;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.GlobalProperty;
 import org.openmrs.LocationAttribute;
 import org.openmrs.api.context.Context;
@@ -16,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Set;
+import java.util.List;
+import java.util.Collections;
 
 public class Utils {
 	
@@ -92,6 +96,12 @@ public class Utils {
 		patientAddressNode.put("SUB_COUNTY", sub_county);
 		patientAddressNode.put("WARD", ward);
 		return patientAddressNode;
+	}
+	
+	public static Encounter lastEncounter(Patient patient, EncounterType type) {
+		List<Encounter> encounters = Context.getEncounterService().getEncounters(patient, null, null, null, null,
+		    Collections.singleton(type), null, null, null, false);
+		return encounters.size() > 0 ? encounters.get(encounters.size() - 1) : null;
 	}
 	
 	/**
