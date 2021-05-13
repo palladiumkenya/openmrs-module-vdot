@@ -35,10 +35,6 @@
         <addForeignKeyConstraint constraintName="vdot_item_owner_fk" baseTableName="vdot_item" baseColumnNames="owner"  referencedTableName="users"
                                  referencedColumnNames="user_id" />
     </changeSet> -->
-
-
-
-
     <!--Adding scheduled task to push patient info to vdot system-->
     <changeSet id="kenyaemr_vdot_001" author="makombe">
         <preConditions onFail="MARK_RAN">
@@ -64,9 +60,95 @@
         </insert>
     </changeSet>
 
+    <!--Schema definition for storing outgoing vdot patient enrolment data-->
+    <changeSet id="kenyaemr_vdot_002" author="schege">
 
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="kenyaemr_vdot_nimeconfirm_enrolment" /></not>
+        </preConditions>
+        <comment>
+            Create table to store patients enrolled in nimeconfirm
+        </comment>
+        <createTable tableName="kenyaemr_vdot_nimeconfirm_enrolment">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="patient_id" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="payload" type="Text">
+                <constraints nullable="true" unique="false"/>
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column defaultValueBoolean="false" name="voided" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+            <column name="date_voided" type="datetime"/>
+            <column name="voided_reason" type="varchar(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kenyaemr_vdot_nimeconfirm_enrolment"
+                                 baseColumnNames="patient_id"
+                                 constraintName="kenyaemr_patient" referencedTableName="patient"
+                                 referencedColumnNames="patient_id"/>
+    </changeSet>
 
+    <!--Schema definition for storing incoming video observations-->
+    <changeSet id="kenyaemr_vdot_003" author="schege">
 
-
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="kenyaemr_vdot_nimeconfirm_video_obs" /></not>
+        </preConditions>
+        <comment>
+            Create table to store incoming video observations from nimeconfirm
+        </comment>
+        <createTable tableName="kenyaemr_vdot_nimeconfirm_video_obs">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="patient_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="double">
+                <constraints nullable="true" unique="false"/>
+            </column>
+            <column name="timestamp" type="Text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="patient_status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column defaultValueBoolean="false" name="voided" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+            <column name="date_voided" type="datetime"/>
+            <column name="voided_reason" type="varchar(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="kenyaemr_vdot_nimeconfirm_video_obs"
+                                 baseColumnNames="patient_id"
+                                 constraintName="kenyaemr_patient" referencedTableName="patient"
+                                 referencedColumnNames="patient_id"/>
+    </changeSet>
 
 </databaseChangeLog>
