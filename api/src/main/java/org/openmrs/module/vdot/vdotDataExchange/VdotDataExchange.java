@@ -155,10 +155,9 @@ public class VdotDataExchange {
 	}
 	
 	/**
-	 * processes results from vdot *
+	 * processes incoming message from vdot server *
 	 * 
-	 * @param resultPayload this should be an object
-	 * @return
+	 *  @return
 	 */
 	public String processIncomingVdotData(String resultPayload) {
 		org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
@@ -173,8 +172,6 @@ public class VdotDataExchange {
 			e.printStackTrace();
 		}
 		
-		// VDot has a tendency of pushing multiple registrations.
-		// first check that a _id is not in the queue data before processing
 		NimeconfirmServiceImpl nimeconfirmService = new NimeconfirmServiceImpl();
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
 		if (jsonNode != null) {
@@ -185,14 +182,11 @@ public class VdotDataExchange {
 			org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
 			        .get("patientsData");
 			
-			String timestamp = timestampNode.toString();
 			List<Object> patientsData = new ArrayList<Object>();
 			patientsData.add(patientDataNode);
-			org.codehaus.jackson.node.ArrayNode patientsDataArray = JsonNodeFactory.instance.arrayNode();
 			
 			Patient patient = videoObs.getPatient();
 			if (patientsData.size() > 0) {
-				// for (patientsData : patient) {
 				for (int i = 0; i < patientsData.size(); ++i) {
 					videoObs.setPatient(patient);
 					videoObs.setId(patient.getId());
