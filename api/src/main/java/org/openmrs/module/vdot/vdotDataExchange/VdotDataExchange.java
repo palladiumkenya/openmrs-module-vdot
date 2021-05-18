@@ -157,46 +157,36 @@ public class VdotDataExchange {
 	/**
 	 * processes incoming message from vdot server *
 	 * 
-	 *  @return
+	 * @return
 	 */
-	public String processIncomingVdotData(String resultPayload) {
-		org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
-		org.codehaus.jackson.node.ObjectNode jsonNode = null;
-		Map<Integer, org.codehaus.jackson.node.ArrayNode> contactMap = new HashMap<Integer, org.codehaus.jackson.node.ArrayNode>();
+	public String processIncomingVdotData(org.codehaus.jackson.node.ObjectNode jsonNode) {
 		
-		try {
-			jsonNode = (org.codehaus.jackson.node.ObjectNode) mapper.readTree(resultPayload);
-			
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		// Consume read data
 		NimeconfirmServiceImpl nimeconfirmService = new NimeconfirmServiceImpl();
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
-		if (jsonNode != null) {
-			//TODO: Need to handle duplications
-			
-			org.codehaus.jackson.node.ObjectNode timestampNode = (org.codehaus.jackson.node.ObjectNode) jsonNode
-			        .get("timestamp");
-			org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
-			        .get("patientsData");
-			
-			List<Object> patientsData = new ArrayList<Object>();
-			patientsData.add(patientDataNode);
-			
-			Patient patient = videoObs.getPatient();
-			if (patientsData.size() > 0) {
-				for (int i = 0; i < patientsData.size(); ++i) {
-					videoObs.setPatient(patient);
-					videoObs.setId(patient.getId());
-					videoObs.setScore(videoObs.getScore());
-					videoObs.setPatientStatus(videoObs.getPatientStatus());
-					videoObs.setDate(videoObs.getDate());
-				}
+		
+		//TODO: Need to handle duplications
+		
+		org.codehaus.jackson.node.ObjectNode timestampNode = (org.codehaus.jackson.node.ObjectNode) jsonNode
+		        .get("timestamp");
+		org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
+		        .get("patientsData");
+		
+		List<Object> patientsData = new ArrayList<Object>();
+		patientsData.add(patientDataNode);
+		
+		Patient patient = videoObs.getPatient();
+		if (patientsData.size() > 0) {
+			for (int i = 0; i < patientsData.size(); ++i) {
+				videoObs.setPatient(patient);
+				videoObs.setId(patient.getId());
+				videoObs.setScore(videoObs.getScore());
+				videoObs.setPatientStatus(videoObs.getPatientStatus());
+				videoObs.setDate(videoObs.getDate());
 			}
-			videoObs.setTimeStamp(timestampNode.toString());
 		}
+		videoObs.setTimeStamp(timestampNode.toString());
+		
 		nimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 		return "Incoming vdot data processed successfully";
 		
