@@ -11,15 +11,25 @@ package org.openmrs.module.vdot.api.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.api.UserService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.vdot.api.db.hibernate.NimeconfirmDao;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.NimeconfirmService;
+import org.openmrs.ui.framework.SimpleObject;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NimeconfirmServiceImpl extends BaseOpenmrsService implements NimeconfirmService {
 	
