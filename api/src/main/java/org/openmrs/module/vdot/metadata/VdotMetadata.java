@@ -58,7 +58,7 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		
 		public static final String VDOT_COMPLETION = "967ed26f-2c4d-4cf4-9f49-1c27a8461756";
 		
-		public static final String VDOT_BASELINE = "";
+		public static final String VDOT_BASELINE = "fc2d5727-8392-4a49-b254-6c7d3138e81d";
 		
 	}
 	
