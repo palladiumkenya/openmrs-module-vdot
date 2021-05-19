@@ -20,24 +20,60 @@
         var PATIENT_ON_ART = GREENCARD_VELOCITY.split(",")[2].split(":")[1];
         var REGIMEN_NAME = GREENCARD_VELOCITY.split(",")[4].split(":")[1];
 
+        jq(document).ready(function(){
 
-        function onEncounterDateChange() {
-            var patientId = <lookup expression="patient.patientId"/>;
-            var encDate = getValue('encounter-date.value');
-            if(encDate == null) {
-                encDate = new Date();
-            }
             if(PATIENT_ON_ART =="true") {
                 jq('#current-regimen').html(REGIMEN_NAME);
 
-            }else{
+            }else {
                 jq('#current-regimen').html("None");
             }
+         jq("#drug-frequency-obs").change(function(){
+            if (getValue('drug-frequency-obs.value') ==160864 ) {
+                jq('#morning-dose').hide();
+                jq('#evening-dose').show();
+                clearHiddenSections(jq('#morning-dose'));
+            }
+
+            if (getValue('drug-frequency-obs.value') ==160865 ) {
+                jq('#morning-dose').show();
+                jq('#evening-dose').hide();
+                clearHiddenSections(jq('#evening-dose'));
+            }
+
+            if (getValue('drug-frequency-obs.value') == 160858) {
+                jq('#morning-dose').show();
+                jq('#evening-dose').show();
+            }
+
+        });
+
+        jq("#sch-type-obs").change(function(){
+            if (getValue('sch-type-obs.value') == 164210) {
+                jq('#day-school').show();
+            }
+            else
+            {
+                clearHiddenSections(jq('#day-school'));
+                jq('#day-school').hide();
+            }
+        });
+        });
+
+        clearHiddenSections = function(parentObj) {
+            parentObj.find('input[type=radio]').each(function() {
+                this.checked = false;
+            });
+            parentObj.find('input[type=checkbox]').each(function() {
+                this.checked = false;
+            });
+            parentObj.find('input[type=text]').each(function() {
+                jq(this).val("");
+            });
+            parentObj.find('select').each(function() {
+                this.selectedIndex =0;
+            });
         }
-        //On ready
-        jq(function() {
-            onEncounterDateChange();
-        })
 
     </script>
 
@@ -68,7 +104,7 @@
                     <td id="drugs-frequency"/>
                     How often do you take drugs?</td>
                     <td>
-                        <obs conceptId="160855AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                        <obs id="drug-frequency-obs" conceptId="160855AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="160865AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160864AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerLabels="Once daily in the morning,Once daily in the evening,
                              Twice daily"
@@ -199,21 +235,21 @@
                         <obs conceptId="1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="160289AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1713AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1714AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
                              159785AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Pre-primary,Primary,Secondary,Tertiary" style="dropdown"/>/>
+                             answerLabels="Pre-primary,Primary,Secondary,Tertiary" style="dropdown"/>
 
                     </td>
                 </tr>
                 <tr>
                     <td id="sch-type">What type of school does the child attend?</td>
                     <td>
-                        <obs conceptId="159928AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                        <obs id="sch-type-obs" conceptId="159928AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="164210AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,164211AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                                      answerLabels="Day school,Boarding school"
-                        />
+                        style="radio"/>
 
                     </td>
                 </tr>
-                <tr id="day-school-distance">
+                <tr id="day-school">
                     <td id="distance-to-sch">How far is the child's school from home?</td>
                     <td>
                         <obs conceptId="1811AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
