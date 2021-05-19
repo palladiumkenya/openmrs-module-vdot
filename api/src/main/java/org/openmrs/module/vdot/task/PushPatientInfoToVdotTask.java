@@ -95,82 +95,82 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 			nimeconfirmService.saveNimeconfirmEnrolment(outMsg);
 			
 			JsonNodeFactory factory = JsonNodeFactory.instance;
+			try {
+				//Define a postRequest request
+				HttpPost loginRequest = new HttpPost(loginUrl);
+				ObjectNode loginObject = factory.objectNode();
+				loginObject.put("username", user.trim());
+				loginObject.put("password", pwd.trim());
+				
+				//Set the API media type in http content-type header
+				loginRequest.addHeader("content-type", "application/json");
+				
+				//Set the request post body
+				StringEntity userEntity = new StringEntity(loginObject.toString());
+				loginRequest.setEntity(userEntity);
+				
+				//Send the request; It will immediately return the response in HttpResponse object if any
+				HttpResponse response = loginClient.execute(loginRequest);
+				
+				//verify the valid error code first
+				int statusCode = response.getStatusLine().getStatusCode();
+				if (statusCode != 200) {
+					throw new RuntimeException("Failed with HTTP error code : " + statusCode);
+				}
+				HttpEntity entity = response.getEntity();
+				String responseString = EntityUtils.toString(entity, "UTF-8");
+				Map<String, Object> responseMap = new ObjectMapper().readValue(responseString, Map.class);
+				
+				Boolean success = (Boolean) responseMap.get("success");
+				token = responseMap.get("token").toString();
+				successful = success;
+				
+			}
+			finally {
+				//Important: Close the connect
+				loginClient.close();
+			}
+			
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			
+			String API_KEY = token;
+			
+			if (successful && API_KEY != null) {
 				try {
 					//Define a postRequest request
-					HttpPost loginRequest = new HttpPost(loginUrl);
-					ObjectNode loginObject = factory.objectNode();
-					loginObject.put("username", user.trim());
-					loginObject.put("password", pwd.trim());
+					HttpPost postRequest = new HttpPost(serverUrl);
 					
 					//Set the API media type in http content-type header
-					loginRequest.addHeader("content-type", "application/json");
+					postRequest.addHeader("content-type", "application/json");
+					postRequest.addHeader("Authorization", "Bearer " + API_KEY);
 					
 					//Set the request post body
-					StringEntity userEntity = new StringEntity(loginObject.toString());
-					loginRequest.setEntity(userEntity);
+					StringEntity userEntity = new StringEntity(payload.toString());
+					postRequest.setEntity(userEntity);
 					
 					//Send the request; It will immediately return the response in HttpResponse object if any
-					HttpResponse response = loginClient.execute(loginRequest);
+					HttpResponse response = httpClient.execute(postRequest);
 					
 					//verify the valid error code first
 					int statusCode = response.getStatusLine().getStatusCode();
 					if (statusCode != 200) {
 						throw new RuntimeException("Failed with HTTP error code : " + statusCode);
 					}
-					HttpEntity entity = response.getEntity();
-					String responseString = EntityUtils.toString(entity, "UTF-8");
-					Map<String, Object> responseMap = new ObjectMapper().readValue(responseString, Map.class);
-					
-					Boolean success = (Boolean) responseMap.get("success");
-					token = responseMap.get("token").toString();
-					successful = success;
-					
+					System.out.println("Successfully executed the task that pushes vdot data");
+					log.info("Successfully executed the task that pushes vdot data");
 				}
 				finally {
 					//Important: Close the connect
-					loginClient.close();
+					httpClient.close();
 				}
 				
-				CloseableHttpClient httpClient = HttpClients.createDefault();
+				lastPatientEntry.setPropertyValue(lastPatientId.toString());
+				Context.getAdministrationService().saveGlobalProperty(lastPatientEntry);
 				
-				String API_KEY = token;
-				
-				if (successful && API_KEY != null) {
-					try {
-						//Define a postRequest request
-						HttpPost postRequest = new HttpPost(serverUrl);
-						
-						//Set the API media type in http content-type header
-						postRequest.addHeader("content-type", "application/json");
-						postRequest.addHeader("Authorization", "Bearer " + API_KEY);
-						
-						//Set the request post body
-						StringEntity userEntity = new StringEntity(payload.toString());
-						postRequest.setEntity(userEntity);
-						
-						//Send the request; It will immediately return the response in HttpResponse object if any
-						HttpResponse response = httpClient.execute(postRequest);
-						
-						//verify the valid error code first
-						int statusCode = response.getStatusLine().getStatusCode();
-						if (statusCode != 200) {
-							throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-						}
-						System.out.println("Successfully executed the task that pushes vdot data");
-						log.info("Successfully executed the task that pushes vdot data");
-					}
-					finally {
-						//Important: Close the connect
-						httpClient.close();
-					}
-					
-					lastPatientEntry.setPropertyValue(lastPatientId.toString());
-					Context.getAdministrationService().saveGlobalProperty(lastPatientEntry);
-					
-				} else {
-					System.out.println("Login to the vdot application was not successful");
-					log.info("Login to the Vdot application was not successful");
-				}
+			} else {
+				System.out.println("Login to the vdot application was not successful");
+				log.info("Login to the Vdot application was not successful");
+			}
 		}
 		catch (Exception e) {
 			throw new IllegalArgumentException("Vdot POST task could not be executed!", e);

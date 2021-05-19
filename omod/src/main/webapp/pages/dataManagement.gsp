@@ -50,12 +50,26 @@
         <br/>
         <br/>
         <br/>
-        <button>Pull data</button>
+        <button style="border: solid" id="pullMessagesFromVdot">Pull data</button>
     </div>
 </div>
 
 <script type="text/javascript">
+    jq = jQuery;
     jQuery(function() {
+
+        jq('#pullMessagesFromVdot').click(function() {
+            jq.getJSON('${ ui.actionLink("vdot", "vdotPatientData", "getMessagesFromVdot") }',
+                {
+
+                })
+                .success(function(data) {
+                    jq('#msgBox').html("Vdot messages processed successfully");
+                })
+                .error(function(xhr, status, err) {
+                    jq('#msgBox').html("There was an error processing Vdot messages");
+                })
+        });
 
     });
 </script>

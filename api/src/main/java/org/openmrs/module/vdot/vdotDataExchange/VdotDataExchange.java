@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.openmrs.PatientProgram;
 import org.openmrs.Program;
 import org.openmrs.Patient;
@@ -16,6 +17,8 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.DrugOrder;
+import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
+import org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl;
 import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.calculation.result.CalculationResult;
 
@@ -32,8 +35,14 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import static org.openmrs.module.vdot.util.Utils.getJsonNodeFactory;
 
 public class VdotDataExchange {
 	
@@ -54,7 +63,7 @@ public class VdotDataExchange {
 		Context.addProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		EncounterService encounterService = Context.getEncounterService();
 		
-		ObjectNode payload = Utils.getJsonNodeFactory().objectNode();
+		ObjectNode payload = getJsonNodeFactory().objectNode();
 		
 		String dob = patient.getBirthdate() != null ? Utils.getSimpleDateFormat("yyyy-MM-dd").format(patient.getBirthdate())
 		        : "";
@@ -143,6 +152,44 @@ public class VdotDataExchange {
 		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		
 		return payload;
+	}
+	
+	/**
+	 * processes incoming message from vdot server *
+	 * 
+	 * @return
+	 */
+	public String processIncomingVdotData(org.codehaus.jackson.node.ObjectNode jsonNode) {
+		
+		// Consume read data
+		NimeconfirmServiceImpl nimeconfirmService = new NimeconfirmServiceImpl();
+		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
+		
+		//TODO: Need to handle duplications
+		
+		org.codehaus.jackson.node.ObjectNode timestampNode = (org.codehaus.jackson.node.ObjectNode) jsonNode
+		        .get("timestamp");
+		org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
+		        .get("patientsData");
+		
+		List<Object> patientsData = new ArrayList<Object>();
+		patientsData.add(patientDataNode);
+		
+		Patient patient = videoObs.getPatient();
+		if (patientsData.size() > 0) {
+			for (int i = 0; i < patientsData.size(); ++i) {
+				videoObs.setPatient(patient);
+				videoObs.setId(patient.getId());
+				videoObs.setScore(videoObs.getScore());
+				videoObs.setPatientStatus(videoObs.getPatientStatus());
+				videoObs.setDate(videoObs.getDate());
+			}
+		}
+		videoObs.setTimeStamp(timestampNode.toString());
+		
+		nimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+		return "Incoming vdot data processed successfully";
+		
 	}
 	
 	private String getCountyCodes(String name) {
