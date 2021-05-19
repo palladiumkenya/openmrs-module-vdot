@@ -29,7 +29,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.NimeconfirmService;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.ui.framework.page.PageModel;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class VdotPatientObservationsFragmentController {
 	
 	public void postEnrollmentMessage() {
 		
-		NimeconfirmService nimeconfirmService = Context.getService(NimeconfirmService.class);
+		INimeconfirmService nimeconfirmService = Context.getService(INimeconfirmService.class);
 		
 		try {
 			URLConnection connection = new URL(url).openConnection();
