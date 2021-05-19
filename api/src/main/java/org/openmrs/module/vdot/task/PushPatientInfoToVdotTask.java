@@ -9,19 +9,15 @@
  */
 package org.openmrs.module.vdot.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+
+import org.openmrs.Encounter;
+import org.openmrs.Patient;
+import org.openmrs.api.EncounterService;
+
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
@@ -30,9 +26,11 @@ import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
 
 /**
  * Prepare payload for VDOT application
@@ -54,126 +52,91 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 				authenticate();
 			}
 			
-			GlobalProperty gpLoginUrl = Context.getAdministrationService().getGlobalPropertyObject(
-			    VdotMetadata.VDOT_LOGIN_URL);
-			GlobalProperty gpLoginUser = Context.getAdministrationService().getGlobalPropertyObject(VdotMetadata.VDOT_USER);
-			GlobalProperty gpLoginPwd = Context.getAdministrationService().getGlobalPropertyObject(VdotMetadata.VDOT_PWD);
+			GlobalProperty lastEncounterEntryFromGP = Context.getAdministrationService().getGlobalPropertyObject(
+			    VdotMetadata.VDOT_LAST_ENROLLMENT_ENCOUNTER);// this will store the last encounter id prior to task execution
 			
-			GlobalProperty gpPostVdotUrl = Context.getAdministrationService().getGlobalPropertyObject(
-			    VdotMetadata.VDOT_ENROLLMENT_POST_API);
+			String lastEncounterSql = "select max(encounter_id) last_id from encounter where voided=0;";
+			List<List<Object>> lastEncounterId = Context.getAdministrationService().executeSQL(lastEncounterSql, true);
 			
-			String loginUrl = gpLoginUrl.getPropertyValue();
-			String user = gpLoginUser.getPropertyValue();
-			String pwd = gpLoginPwd.getPropertyValue();
+			Integer lastIdFromEncounterTable = (Integer) lastEncounterId.get(0).get(0);
+			lastIdFromEncounterTable = lastIdFromEncounterTable != null ? lastIdFromEncounterTable : 0;
 			
-			String serverUrl = gpPostVdotUrl.getPropertyValue();
+			String lastEncounterValueFromGPStr = lastEncounterEntryFromGP != null
+			        && lastEncounterEntryFromGP.getValue() != null ? lastEncounterEntryFromGP.getValue().toString() : "";
+			Integer lastEncounterIDFromGP = StringUtils.isNotBlank(lastEncounterValueFromGPStr) ? Integer
+			        .parseInt(lastEncounterValueFromGPStr) : 0;
 			
-			if (StringUtils.isBlank(loginUrl) || StringUtils.isBlank(user) || StringUtils.isBlank(pwd)
-			        || StringUtils.isBlank(serverUrl)) {
-				System.out.println("No credentials for posting patient info to vdot application");
-				return;
+			List<Encounter> pendingEnrollments = fetchPendingEnrollments(lastEncounterIDFromGP, lastIdFromEncounterTable);
+			Map<Patient, List<Encounter>> groupedEncounters = groupEncountersByPatient(pendingEnrollments);
+			for (Map.Entry entry : groupedEncounters.entrySet()) {
+				processPendingEnrollments((Patient) entry.getKey());
 			}
 			
-			GlobalProperty lastPatientEntry = Context.getAdministrationService().getGlobalPropertyObject(
-			    VdotMetadata.VDOT_LAST_PATIENT_ENTRY);
-			String sql = "select max(patient_id) last_id from patient_program pp\n"
-			        + "join program pr on pr.program_id = pp.program_id\n"
-			        + "where voided=0 and pr.uuid =\"b2b2dd4a-3aa5-4c98-93ad-4970b06819ef\";";
-			List<List<Object>> lastVdotEnrollment = Context.getAdministrationService().executeSQL(sql, true);
+			lastEncounterEntryFromGP.setPropertyValue(lastIdFromEncounterTable.toString());
+			Context.getAdministrationService().saveGlobalProperty(lastEncounterEntryFromGP);
 			
-			Integer lastPatientId = (Integer) lastVdotEnrollment.get(0).get(0);
-			lastPatientId = lastPatientId != null ? lastPatientId : 0;
-			
-			VdotDataExchange e = new VdotDataExchange();
-			ObjectNode payload = e.generatePayloadForVdot(Context.getPatientService().getPatient(lastPatientId));
-			Date date = new Date();
-			boolean successful = false;
-			CloseableHttpClient loginClient = HttpClients.createDefault();
-			String token = null;
-			NimeconfirmEnrolment outMsg = new NimeconfirmEnrolment(Context.getPatientService().getPatient(lastPatientId),
-			        payload.toString(), "Pending", date);
-			nimeconfirmService.saveNimeconfirmEnrolment(outMsg);
-			
-			JsonNodeFactory factory = JsonNodeFactory.instance;
-			try {
-				//Define a postRequest request
-				HttpPost loginRequest = new HttpPost(loginUrl);
-				ObjectNode loginObject = factory.objectNode();
-				loginObject.put("username", user.trim());
-				loginObject.put("password", pwd.trim());
-				
-				//Set the API media type in http content-type header
-				loginRequest.addHeader("content-type", "application/json");
-				
-				//Set the request post body
-				StringEntity userEntity = new StringEntity(loginObject.toString());
-				loginRequest.setEntity(userEntity);
-				
-				//Send the request; It will immediately return the response in HttpResponse object if any
-				HttpResponse response = loginClient.execute(loginRequest);
-				
-				//verify the valid error code first
-				int statusCode = response.getStatusLine().getStatusCode();
-				if (statusCode != 200) {
-					throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-				}
-				HttpEntity entity = response.getEntity();
-				String responseString = EntityUtils.toString(entity, "UTF-8");
-				Map<String, Object> responseMap = new ObjectMapper().readValue(responseString, Map.class);
-				
-				Boolean success = (Boolean) responseMap.get("success");
-				token = responseMap.get("token").toString();
-				successful = success;
-				
-			}
-			finally {
-				//Important: Close the connect
-				loginClient.close();
-			}
-			
-			CloseableHttpClient httpClient = HttpClients.createDefault();
-			
-			String API_KEY = token;
-			
-			if (successful && API_KEY != null) {
-				try {
-					//Define a postRequest request
-					HttpPost postRequest = new HttpPost(serverUrl);
-					
-					//Set the API media type in http content-type header
-					postRequest.addHeader("content-type", "application/json");
-					postRequest.addHeader("Authorization", "Bearer " + API_KEY);
-					
-					//Set the request post body
-					StringEntity userEntity = new StringEntity(payload.toString());
-					postRequest.setEntity(userEntity);
-					
-					//Send the request; It will immediately return the response in HttpResponse object if any
-					HttpResponse response = httpClient.execute(postRequest);
-					
-					//verify the valid error code first
-					int statusCode = response.getStatusLine().getStatusCode();
-					if (statusCode != 200) {
-						throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-					}
-					System.out.println("Successfully executed the task that pushes vdot data");
-					log.info("Successfully executed the task that pushes vdot data");
-				}
-				finally {
-					//Important: Close the connect
-					httpClient.close();
-				}
-				
-				lastPatientEntry.setPropertyValue(lastPatientId.toString());
-				Context.getAdministrationService().saveGlobalProperty(lastPatientEntry);
-				
-			} else {
-				System.out.println("Login to the vdot application was not successful");
-				log.info("Login to the Vdot application was not successful");
-			}
 		}
 		catch (Exception e) {
 			throw new IllegalArgumentException("Vdot POST task could not be executed!", e);
 		}
 	}
+	
+	private List<Encounter> fetchPendingEnrollments(Integer lastEncounterIdFromGP, Integer lastEncounterFromEncounterTable) {
+		
+		StringBuilder q = new StringBuilder();
+		q.append("select e.encounter_id ");
+		q.append("from encounter e inner join "
+		        + "( "
+		        + " select encounter_type_id, uuid, name from encounter_type where uuid ='cf805d0a-a470-4194-b375-7e04f56d4dee' "
+		        + " ) et on et.encounter_type_id=e.encounter_type ");
+		
+		if (lastEncounterIdFromGP != null && lastEncounterIdFromGP > 0) {
+			q.append("where e.encounter_id > " + lastEncounterIdFromGP + " ");
+		} else {
+			q.append("where e.encounter_id <= " + lastEncounterFromEncounterTable + " ");
+		}
+		
+		q.append(" and e.voided = 0 group by e.encounter_id ");
+		List<Encounter> encounters = new ArrayList<Encounter>();
+		EncounterService encounterService = Context.getEncounterService();
+		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
+		for (List<Object> row : queryData) {
+			Integer encounterId = (Integer) row.get(0);
+			Encounter e = encounterService.getEncounter(encounterId);
+			encounters.add(e);
+		}
+		System.out.println("No. of vdot enrollment encounters found: " + encounters.size());
+		return encounters;
+		
+	}
+	
+	/**
+	 * Processes a list of encounters
+	 * 
+	 * @return a map containing encounters for each patient
+	 */
+	private Map<Patient, List<Encounter>> groupEncountersByPatient(List<Encounter> encounters) {
+		Map<Patient, List<Encounter>> encounterMap = new HashMap<Patient, List<Encounter>>();
+		
+		for (Encounter encounter : encounters) {
+			if (encounterMap.keySet().contains(encounter.getPatient())) {
+				encounterMap.get(encounter.getPatient()).add(encounter);
+			} else {
+				List<Encounter> eList = new ArrayList<Encounter>();
+				eList.add(encounter);
+				encounterMap.put(encounter.getPatient(), eList);
+			}
+		}
+		return encounterMap;
+	}
+	
+	private void processPendingEnrollments(Patient patient) {
+		VdotDataExchange e = new VdotDataExchange();
+		ObjectNode payload = e.generatePayloadForVdot(patient);
+		Date date = new Date();
+		NimeconfirmEnrolment outMsg = new NimeconfirmEnrolment(patient, payload.toString(), "Pending", date);
+		nimeconfirmService.saveNimeconfirmEnrolment(outMsg);
+		
+	}
+	
 }

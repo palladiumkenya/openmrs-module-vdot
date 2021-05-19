@@ -60,6 +60,25 @@ public class NimeconfirmDao implements INimeconfirmDao {
 	}
 	
 	@Override
+	public List<NimeconfirmEnrolment> getNimeconfirmEnrolmentsToSend(NimeconfirmEnrolment enrolment) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmEnrolment.class);
+		criteria.add(Restrictions.eq("voided", false));
+		//return result
+		return criteria.list();
+	}
+	
+	@Override
+	public NimeconfirmEnrolment getNimeconfirmEnrolmentByStatus(String status) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmEnrolment.class);
+		criteria.add(Restrictions.eq("status", status));
+		criteria.add(Restrictions.eq("voided", false));
+		if (!CollectionUtils.isEmpty(criteria.list())) {
+			return (NimeconfirmEnrolment) criteria.list().get(0);
+		}
+		return null;
+	}
+	
+	@Override
 	public void voidNimeconfirmEnrolment(int id) {
 		sessionFactory.getCurrentSession().saveOrUpdate(id);
 	}
