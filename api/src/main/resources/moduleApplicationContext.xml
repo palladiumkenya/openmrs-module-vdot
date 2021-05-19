@@ -26,7 +26,7 @@
     <context:component-scan base-package="org.openmrs.module.vdot" />
 
 
-    <!-- Wraps NimeconfirmService methods in DB transactions and OpenMRS interceptors,
+    <!-- Wraps INimeconfirmService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
     <bean id="vdot.NimeconfirmService"
             class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -54,12 +54,12 @@
         </property>
     </bean>
 
-    <!-- Adds NimeconfirmService to OpenMRS context so it can be accessed
-    calling Context.getService(NimeconfirmService.class) -->
+    <!-- Adds INimeconfirmService to OpenMRS context so it can be accessed
+    calling Context.getService(INimeconfirmService.class) -->
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.openmrs.module.vdot.api.NimeconfirmService</value>
+                <value>org.openmrs.module.vdot.api.INimeconfirmService</value>
                 <ref bean="vdot.NimeconfirmService" />
             </list>
         </property>
@@ -90,9 +90,9 @@
 
     <!-- Forms config -->
     <bean id="vdot.config.form" class="org.openmrs.module.kenyacore.form.FormConfiguration">
-        <property name="commonVisitForms">
+        <property name="commonPatientForms">
             <set>
-
+                <ref bean="vdot.form.baselineQuestionaire" />
              </set>
         </property>
     </bean>
@@ -125,6 +125,17 @@
         </property>
         <property name="icon" value="kenyaui:forms/completion.png" />
         <property name="htmlform" value="vdot:vdot/vdotClientDiscontinuation.html" />
+    </bean>
+    <bean id="vdot.form.baselineQuestionaire" class="org.openmrs.module.kenyacore.form.FormDescriptor">
+        <property name="targetUuid" value="fc2d5727-8392-4a49-b254-6c7d3138e81d" />
+        <property name="apps">
+            <set>
+                <ref bean="kenyaemr.app.clinician" />
+                <ref bean="kenyaemr.app.chart" />
+            </set>
+        </property>
+        <property name="icon" value="kenyaui:forms/family_history.png" />
+        <property name="htmlform" value="vdot:vdot/baselineQuestionaire.html" />
     </bean>
 
     <!-- Forms addition -->

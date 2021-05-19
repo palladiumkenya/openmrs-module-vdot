@@ -48,6 +48,8 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		
 		public static final String VDOT_CLIENT_DISCONTINUATION = "90e54c41-da23-4ace-b472-0c8521c97594";
 		
+		public static final String VDOT_BASELINE_ENCOUNTER = "e360f35f-e496-4f01-843b-e2894e278b5b";
+		
 	}
 	
 	public static final class _Form {
@@ -55,6 +57,8 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		public static final String VDOT_ENROLLMENT = "197c6ff4-059d-4440-9693-a4bc7520c7b4";
 		
 		public static final String VDOT_COMPLETION = "967ed26f-2c4d-4cf4-9f49-1c27a8461756";
+		
+		public static final String VDOT_BASELINE = "";
 		
 	}
 	
@@ -72,6 +76,7 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		install(encounterType("Vdot Enrollment", "Vdot Enrollment Encounter", _EncounterType.VDOT_CLIENT_ENROLLMENT));
 		install(encounterType("Vdot Discontinuation", "Vdot Discontinuation Encounter",
 		    _EncounterType.VDOT_CLIENT_DISCONTINUATION));
+		install(encounterType("Vdot baseline", "Vdot Encounter type", _EncounterType.VDOT_BASELINE_ENCOUNTER));
 		
 		// Installing forms
 		
@@ -79,6 +84,8 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		    _Form.VDOT_ENROLLMENT));
 		install(form("Vdot Discontinuation form", "Vdot Discontinuation Form", _EncounterType.VDOT_CLIENT_DISCONTINUATION,
 		    "1", _Form.VDOT_COMPLETION));
+		install(form("Baseline questionaire form", "Vdot baseline Questionaire Form",
+		    _EncounterType.VDOT_BASELINE_ENCOUNTER, "1", _Form.VDOT_BASELINE));
 		
 		//Installing program
 		

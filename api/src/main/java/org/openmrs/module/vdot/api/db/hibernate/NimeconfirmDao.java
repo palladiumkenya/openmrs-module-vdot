@@ -19,6 +19,7 @@ import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.dao.INimeconfirmDao;
 
+import java.util.Date;
 import java.util.List;
 
 public class NimeconfirmDao implements INimeconfirmDao {
@@ -81,12 +82,24 @@ public class NimeconfirmDao implements INimeconfirmDao {
 	}
 	
 	@Override
-	public NimeconfirmVideoObs getNimeconfirmVideoObsByPatient(Patient patient) {
+	public List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatient(Patient patient) {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmVideoObs.class);
 		criteria.add(Restrictions.eq("patient", patient));
 		criteria.add(Restrictions.eq("voided", false));
 		if (!CollectionUtils.isEmpty(criteria.list())) {
-			return (NimeconfirmVideoObs) criteria.list().get(0);
+			return criteria.list();
+		}
+		return null;
+	}
+	
+	@Override
+	public List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatientAndDate(Patient patient, Date date) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmVideoObs.class);
+		criteria.add(Restrictions.eq("patient", patient));
+		criteria.add(Restrictions.eq("voided", false));
+		criteria.add(Restrictions.eq("date", date.after(date)));
+		if (!CollectionUtils.isEmpty(criteria.list())) {
+			return criteria.list();
 		}
 		return null;
 	}

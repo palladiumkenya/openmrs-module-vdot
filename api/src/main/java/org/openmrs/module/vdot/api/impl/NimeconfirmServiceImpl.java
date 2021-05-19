@@ -14,14 +14,15 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.db.hibernate.NimeconfirmDao;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
-import org.openmrs.module.vdot.api.NimeconfirmService;
 
+import java.util.Date;
 import java.util.List;
 
-public class NimeconfirmServiceImpl extends BaseOpenmrsService implements NimeconfirmService {
+public class NimeconfirmServiceImpl extends BaseOpenmrsService implements INimeconfirmService {
 	
 	protected final Log log = LogFactory.getLog(this.getClass());
 	
@@ -74,8 +75,13 @@ public class NimeconfirmServiceImpl extends BaseOpenmrsService implements Nimeco
 	}
 	
 	@Override
-	public NimeconfirmVideoObs getNimeconfirmVideoObsByPatient(Patient patient) {
+	public List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatient(Patient patient) {
 		return nimeconfirmDao.getNimeconfirmVideoObsByPatient(patient);
+	}
+	
+	@Override
+	public List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatientAndDate(Patient patient, Date date) {
+		return nimeconfirmDao.getNimeconfirmVideoObsByPatientAndDate(patient, date);
 	}
 	
 	@Override

@@ -12,6 +12,7 @@ package org.openmrs.module.vdot.api;
 import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ import java.util.List;
  * moduleApplicationContext.xml on how it is wired up.
  */
 
-public interface NimeconfirmService extends OpenmrsService {
+public interface INimeconfirmService extends OpenmrsService {
 	
 	NimeconfirmEnrolment saveNimeconfirmEnrolment(NimeconfirmEnrolment enrolment);
 	
@@ -33,7 +34,9 @@ public interface NimeconfirmService extends OpenmrsService {
 	
 	NimeconfirmVideoObs saveNimeconfirmVideoObs(NimeconfirmVideoObs videoObs);
 	
-	NimeconfirmVideoObs getNimeconfirmVideoObsByPatient(Patient patient);
+	List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatient(Patient patient);
+	
+	List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatientAndDate(Patient patient, Date date);
 	
 	List<NimeconfirmVideoObs> getNimeconfirmVideoObs();
 	
