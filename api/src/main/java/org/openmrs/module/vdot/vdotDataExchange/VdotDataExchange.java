@@ -1,5 +1,6 @@
 package org.openmrs.module.vdot.vdotDataExchange;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -9,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.node.JsonNodeFactory;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.PatientProgram;
 import org.openmrs.Program;
 import org.openmrs.Patient;
@@ -16,6 +18,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.DrugOrder;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl;
 import org.openmrs.util.PrivilegeConstants;
@@ -36,6 +39,7 @@ import org.openmrs.ui.framework.SimpleObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +54,8 @@ public class VdotDataExchange {
 	Program vdotProgram = MetadataUtils.existing(Program.class, VdotMetadata._Program.VDOT_PROGRAM);
 	
 	ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
+	
+	private List<PatientIdentifierType> allPatientIdentifierTypes;
 	
 	public static final Locale LOCALE = Locale.ENGLISH;
 	
@@ -162,36 +168,49 @@ public class VdotDataExchange {
 	 * 
 	 * @return
 	 */
-	public String processIncomingVdotData(org.codehaus.jackson.node.ObjectNode jsonNode) {
+	public String processIncomingVdotData(String payload) {
 		
 		// Consume read data
-		NimeconfirmServiceImpl nimeconfirmService = new NimeconfirmServiceImpl();
+		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
+		String message = "";
 		
 		//TODO: Need to handle duplications
-		
-		org.codehaus.jackson.node.ObjectNode timestampNode = (org.codehaus.jackson.node.ObjectNode) jsonNode
-		        .get("timestamp");
-		org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
-		        .get("patientsData");
-		
-		List<Object> patientsData = new ArrayList<Object>();
-		patientsData.add(patientDataNode);
-		
-		Patient patient = videoObs.getPatient();
-		if (patientsData.size() > 0) {
-			for (int i = 0; i < patientsData.size(); ++i) {
-				videoObs.setPatient(patient);
-				videoObs.setId(patient.getId());
-				videoObs.setScore(videoObs.getScore());
-				videoObs.setPatientStatus(videoObs.getPatientStatus());
-				videoObs.setDate(videoObs.getDate());
+		org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
+		try {
+			org.codehaus.jackson.node.ArrayNode patientDataArray = (org.codehaus.jackson.node.ArrayNode) mapper
+			        .readTree(payload);
+			for (Iterator<org.codehaus.jackson.JsonNode> it = patientDataArray.iterator(); it.hasNext();) {
+				org.codehaus.jackson.node.ObjectNode node = (org.codehaus.jackson.node.ObjectNode) it.next();
+				
+				String cccNo = node.get("cccNo").asText();
+				// Check to see a patient with similar upn number exists
+				List<Patient> patients = Context.getPatientService().getPatients(null, cccNo, allPatientIdentifierTypes,
+				    true);
+				if (patients.size() > 0) {
+					Patient patient = patients.get(0);
+					
+					Double score = node.get("adherenceScore").asDouble();
+					String patientStatus = node.get("patientStatus").asText();
+					String timeStamp = node.get("videosTimestamps").asText();
+					
+					videoObs.setPatient(patient);
+					videoObs.setId(patient.getId());
+					videoObs.setScore(score);
+					videoObs.setPatientStatus(patientStatus);
+					videoObs.setTimeStamp(timeStamp);
+					
+					iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+					message = "Successfully updated Vdot video obs";
+				} else {
+					message = "The ccc number for patient doesnt exist";
+				}
 			}
 		}
-		videoObs.setTimeStamp(timestampNode.toString());
-		
-		nimeconfirmService.saveNimeconfirmVideoObs(videoObs);
-		return "Incoming vdot data processed successfully";
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return message;
 		
 	}
 	
