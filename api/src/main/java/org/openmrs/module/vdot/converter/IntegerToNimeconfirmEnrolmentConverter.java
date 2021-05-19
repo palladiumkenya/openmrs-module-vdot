@@ -2,7 +2,7 @@ package org.openmrs.module.vdot.converter;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.NimeconfirmService;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class IntegerToNimeconfirmEnrolmentConverter implements Converter<Integer
 	 */
 	@Override
 	public NimeconfirmEnrolment convert(Integer id) {
-		NimeconfirmService service = Context.getService(NimeconfirmService.class);
+		INimeconfirmService service = Context.getService(INimeconfirmService.class);
 		if (id == null) {
 			return null;
 		} else {

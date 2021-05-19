@@ -3,7 +3,7 @@ package org.openmrs.module.vdot.converter;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.NimeconfirmService;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +19,6 @@ public class StringToNimeconfirmEnrolmentConverter implements Converter<String, 
 			return null;
 		}
 		
-		return Context.getService(NimeconfirmService.class).getNimeconfirmEnrolmentByID(Integer.valueOf(source));
+		return Context.getService(INimeconfirmService.class).getNimeconfirmEnrolmentByID(Integer.valueOf(source));
 	}
 }
