@@ -3,7 +3,6 @@ package org.openmrs.module.vdot.vdotDataExchange;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-//import org.codehaus.jackson.map.ObjectMapper;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
@@ -82,7 +81,10 @@ public class VdotDataExchange {
 		
 		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
 		Integer encounterId = (Integer) queryData.get(0).get(0);
-		Encounter lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
+		Encounter lastDrugOrderEncounter = null;
+		if (encounterId != null) {
+			lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
+		}
 		String frequency = "";
 		
 		if (lastDrugOrderEncounter != null) {
@@ -130,12 +132,13 @@ public class VdotDataExchange {
 			payload.put("facilityCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
 			payload.put("cccNo", cccNumber != null ? cccNumber.getIdentifier() : "");
 			payload.put("dob", dob);
-			payload.put("regimen", regimenName.replace("/", "+"));
+			payload.put("regimen", nascopCode != null || StringUtils.isNotBlank(nascopCode) ? nascopCode
+			        : regimenName != null ? regimenName : "");
 			// payload.put("drug_code", nascopCode != null ? nascopCode : "");
 			payload.put("phoneNumber", phoneNumber != null || StringUtils.isNotBlank(phoneNumber) ? phoneNumber
 			        : nextOfKinPhoneNumber != null ? nextOfKinPhoneNumber : "");
 			payload.put("firstName", patient.getGivenName());
-			payload.put("middleName", patient.getMiddleName());
+			payload.put("middleName", patient.getMiddleName() != null ? patient.getMiddleName() : "");
 			payload.put("surname", patient.getFamilyName());
 			payload.put("currentVl",
 			    vl != null && vl.get("lastVl") != null ? vl.get("lastVl").toString().replace("copies/ml", "") : "");

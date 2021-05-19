@@ -40,7 +40,8 @@
         <br/>
         <br/>
         <br/>
-        <button>Push data</button>
+        <button id="postMessagetoNimeConfirm">Push data</button>
+
     </div>
     <div class="mainBox boxStyle">
         Something here for pulling data
@@ -71,5 +72,17 @@
                 })
         });
 
+    });
+
+    jq(function() {
+        jq('#postMessagetoNimeConfirm').click(function() {
+            jq.getJSON('${ ui.actionLink("vdot", "vdotPatientObservations", "postEnrollmentMessage") }')
+                .success(function(data) {
+                    jq('#msgBox').html("Successfully posted to nimeConfirm");
+                })
+                .error(function(xhr, status, err) {
+                    jq('#msgBox').html("Could not post to nimeConfirm. Kindly contact an admin user for help");
+                })
+        });
     });
 </script>

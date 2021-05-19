@@ -28,6 +28,10 @@ public interface INimeconfirmService extends OpenmrsService {
 	
 	List<NimeconfirmEnrolment> getNimeconfirmEnrolment();
 	
+	List<NimeconfirmEnrolment> getNimeconfirmEnrolmentsToSend(NimeconfirmEnrolment enrolment);
+	
+	NimeconfirmEnrolment getNimeconfirmEnrolmentByStatus(String status);
+	
 	void voidNimeconfirmEnrolment(int id);
 	
 	NimeconfirmEnrolment getNimeconfirmEnrolmentByID(Integer id);
