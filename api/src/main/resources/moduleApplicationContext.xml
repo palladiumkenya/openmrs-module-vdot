@@ -28,7 +28,7 @@
 
     <!-- Wraps INimeconfirmService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
-    <bean id="vdot.NimeconfirmService"
+    <bean id="vdot.INimeconfirmService"
             class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager" />
@@ -60,7 +60,7 @@
         <property name="moduleService">
             <list>
                 <value>org.openmrs.module.vdot.api.INimeconfirmService</value>
-                <ref bean="vdot.NimeconfirmService" />
+                <ref bean="vdot.INimeconfirmService" />
             </list>
         </property>
     </bean>

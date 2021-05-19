@@ -3,7 +3,7 @@ package org.openmrs.module.vdot.converter;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
-import org.openmrs.module.vdot.api.NimeconfirmService;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +19,6 @@ public class StringToNimeconfirmVideoObsConverter implements Converter<String, N
 			return null;
 		}
 		
-		return Context.getService(NimeconfirmService.class).getNimeconfirmVideoObsByID(Integer.valueOf(source));
+		return Context.getService(INimeconfirmService.class).getNimeconfirmVideoObsByID(Integer.valueOf(source));
 	}
 }

@@ -10,7 +10,7 @@
 package org.openmrs.module.vdot.api;
 
 /**
- * This is a unit test, which verifies logic in NimeconfirmService. It doesn't extend
+ * This is a unit test, which verifies logic in INimeconfirmService. It doesn't extend
  * BaseModuleContextSensitiveTest, thus it is run without the in-memory DB and Spring context.
  */
 public class NimeconfirmServiceTest {

@@ -25,7 +25,7 @@ import org.apache.http.util.EntityUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
-import org.openmrs.module.vdot.api.NimeconfirmService;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
 import org.openmrs.scheduler.tasks.AbstractTask;
@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class PushPatientInfoToVdotTask extends AbstractTask {
 	
-	NimeconfirmService nimeconfirmService = Context.getService(NimeconfirmService.class);
+	INimeconfirmService nimeconfirmService = Context.getService(INimeconfirmService.class);
 	
 	private Log log = LogFactory.getLog(PushPatientInfoToVdotTask.class);
 	
