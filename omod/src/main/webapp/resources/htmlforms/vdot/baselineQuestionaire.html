@@ -1,0 +1,276 @@
+<!--
+  ~ The contents of this file are subject to the OpenMRS Public License
+  ~ Version 1.0 (the "License"); you may not use this file except in
+  ~ compliance with the License. You may obtain a copy of the License at
+  ~ http://license.openmrs.org
+  ~
+  ~ Software distributed under the License is distributed on an "AS IS"
+  ~ basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+  ~ License for the specific language governing rights and limitations
+  ~ under the License.
+  ~
+  ~ Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+-->
+<htmlform>
+
+    <script type="text/javascript">
+        var GREENCARD_VELOCITY = "<lookup expression="
+        kenyaemr.GreenCardVelocityCalculation()
+        " />";
+        var PATIENT_ON_ART = GREENCARD_VELOCITY.split(",")[2].split(":")[1];
+        var REGIMEN_NAME = GREENCARD_VELOCITY.split(",")[4].split(":")[1];
+
+        jq(document).ready(function(){
+
+            if(PATIENT_ON_ART =="true") {
+                jq('#current-regimen').html(REGIMEN_NAME);
+
+            }else {
+                jq('#current-regimen').html("None");
+            }
+         jq("#drug-frequency-obs").change(function(){
+            if (getValue('drug-frequency-obs.value') ==160864 ) {
+                jq('#morning-dose').hide();
+                jq('#evening-dose').show();
+                clearHiddenSections(jq('#morning-dose'));
+            }
+
+            if (getValue('drug-frequency-obs.value') ==160865 ) {
+                jq('#morning-dose').show();
+                jq('#evening-dose').hide();
+                clearHiddenSections(jq('#evening-dose'));
+            }
+
+            if (getValue('drug-frequency-obs.value') == 160858) {
+                jq('#morning-dose').show();
+                jq('#evening-dose').show();
+            }
+
+        });
+
+        jq("#sch-type-obs").change(function(){
+            if (getValue('sch-type-obs.value') == 164210) {
+                jq('#day-school').show();
+            }
+            else
+            {
+                clearHiddenSections(jq('#day-school'));
+                jq('#day-school').hide();
+            }
+        });
+        });
+
+        clearHiddenSections = function(parentObj) {
+            parentObj.find('input[type=radio]').each(function() {
+                this.checked = false;
+            });
+            parentObj.find('input[type=checkbox]').each(function() {
+                this.checked = false;
+            });
+            parentObj.find('input[type=text]').each(function() {
+                jq(this).val("");
+            });
+            parentObj.find('select').each(function() {
+                this.selectedIndex =0;
+            });
+        }
+
+    </script>
+
+    <div class="ke-form-header">
+        <table style="width: 100%">
+            <tr>
+                <td align="left">Date:
+                    <encounterDate id="encounter-date" showTime="true"/>
+                </td>
+                <td align="right">Location:
+                    <encounterLocation default="GlobalProperty:kenyaemr.defaultLocation" type="autocomplete"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="ke-form-content">
+        <fieldset>
+            <legend>Drugs</legend>
+
+            <table>
+                <tr>
+                    <td>Current regimen</td>
+                    <td><input type="text" name="current-regimen" id="current-regimen" readonly="True"/></td>
+                </tr>
+
+                <tr>
+                    <td id="drugs-frequency"/>
+                    How often do you take drugs?</td>
+                    <td>
+                        <obs id="drug-frequency-obs" conceptId="160855AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="160865AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160864AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Once daily in the morning,Once daily in the evening,
+                             Twice daily"
+                             style="dropdown"/>
+                    </td>
+                </tr>
+                <tr id="drug-time">
+
+                    <td id="morning-dose">Time for morning dose</td>
+                    <obs conceptId="161015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+
+                    </td>
+                    <td id="evening-dose">Time for evening dose</td>
+                    <td>
+                        <obs conceptId="161017AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>Social-economic status</legend>
+
+            <table>
+                <tr>
+                    <td id="living-with-child">Who does the child currently live with?</td>
+                    <td>
+                        <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Parent,Grand Parent,Foster parent,Relative,Sibling,Guardian"
+                             style="checkbox"/>
+
+                    </td>
+                <tr>
+                    <td id="care-giver">Who is the primary care giver?</td>
+                    <td>
+                        <obs conceptId="160640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                        5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Guardian,Parent,Grand Parent,Sibling,Relative,Foster care"
+                             style="dropdown"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="child-hiv-status-awareness">Who in this household is aware of the child's HIV status?</td>
+                    <td>
+                        <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                        5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Guardian,Parent,Grand Parent,Sibling,Relative,Foster care"
+                             style="checkbox"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td id="other-living-with-hiv">Who else in the home is living with HIV?</td>
+                    <td>
+                        <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                        5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Guardian,Parent,Grand Parent,Sibling,Relative,Foster care,none"
+                             style="checkbox"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td id="source-of-income">What is the primary source of income for this household?</td>
+                    <td>
+                        <obs conceptId="159740AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="159673AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1540AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159613AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+,1538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Business,Formal employment,Casual labour,Farming" style="dropdown"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td id="amount-of-income">How much would you say is the household income?</td>
+                    <td>
+                        <obs conceptId="159776AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="number-living-with-child">How many people are currently living in the same household with
+                        the child?
+                    </td>
+                    <td>
+                        <obs conceptId="1474AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="has-pit-latrine-toilet">Does the household have a pit latrine or toilet?</td>
+                    <td>
+                        <obs conceptId="159389AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="yes_no"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td id="source-of-drinking-water">What is the source of drinking water for the household?</td>
+                    <td>
+                        <obs conceptId="1511AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="1697AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1508AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1506AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1510AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1509AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Piped water,Rain water,River,Borehole,Well" style="dropdown"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="daily-meals">How many meals does the child or adolescent take in a day?</td>
+                    <td>
+                        <obs conceptId="162523AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                    </td>
+                </tr>
+
+            </table>
+        </fieldset>
+        <fieldset>
+            <legend>
+                Schooling
+            </legend>
+            <table>
+                <tr>
+                    <td id="in-school">Is the child in School?</td>
+                    <td>
+                        <obs conceptId="5629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" style="yes_no"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td id="current-sch-level">Level of schooling the child is at?</td>
+                    <td>
+                        <obs conceptId="1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="160289AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1713AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1714AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
+                             159785AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Pre-primary,Primary,Secondary,Tertiary" style="dropdown"/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td id="sch-type">What type of school does the child attend?</td>
+                    <td>
+                        <obs id="sch-type-obs" conceptId="159928AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="164210AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,164211AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                                     answerLabels="Day school,Boarding school"
+                        style="radio"/>
+
+                    </td>
+                </tr>
+                <tr id="day-school">
+                    <td id="distance-to-sch">How far is the child's school from home?</td>
+                    <td>
+                        <obs conceptId="1811AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+
+                    </td>
+
+                    <td id="trans-means-to-sch">What means of transport does the child use to school?</td>
+                    <td>
+                        <obs conceptId="1375AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerConceptIds="159310AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159744AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159748AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1787AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,162710AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabels="Walk,Motorbike,Bicycle,Public transport,School bus"
+                        />
+
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </div>
+
+    <div class="ke-form-footer">
+        <submit/>
+    </div>
+
+</htmlform>

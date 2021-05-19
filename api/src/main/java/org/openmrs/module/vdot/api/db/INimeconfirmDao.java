@@ -4,6 +4,7 @@ import org.openmrs.Patient;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,7 +24,9 @@ public interface INimeconfirmDao {
 	
 	NimeconfirmVideoObs saveNimeconfirmVideoObs(NimeconfirmVideoObs videoObs);
 	
-	NimeconfirmVideoObs getNimeconfirmVideoObsByPatient(Patient patient);
+	List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatient(Patient patient);
+	
+	List<NimeconfirmVideoObs> getNimeconfirmVideoObsByPatientAndDate(Patient patient, Date date);
 	
 	List<NimeconfirmVideoObs> getNimeconfirmVideoObs();
 	
