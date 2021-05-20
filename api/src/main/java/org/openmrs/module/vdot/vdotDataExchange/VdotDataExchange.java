@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 //import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BaseJsonNode;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.node.JsonNodeFactory;
+import org.json.simple.JSONArray;
 import org.openmrs.PatientProgram;
 import org.openmrs.Program;
 import org.openmrs.Patient;
@@ -17,6 +20,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.DrugOrder;
+import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl;
 import org.openmrs.util.PrivilegeConstants;
@@ -35,12 +39,7 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.openmrs.module.vdot.util.Utils.getJsonNodeFactory;
 
@@ -159,18 +158,60 @@ public class VdotDataExchange {
 	 * 
 	 * @return
 	 */
-	public String processIncomingVdotData(org.codehaus.jackson.node.ObjectNode jsonNode) {
+	public String processIncomingVdotData(org.json.simple.JSONObject jsonObject) {
 		
 		// Consume read data
-		NimeconfirmServiceImpl nimeconfirmService = new NimeconfirmServiceImpl();
+		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
+
+		ObjectNode payload = getJsonNodeFactory().objectNode();
+		
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
 		
 		//TODO: Need to handle duplications
 		
-		org.codehaus.jackson.node.ObjectNode timestampNode = (org.codehaus.jackson.node.ObjectNode) jsonNode
-		        .get("timestamp");
-		org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
+		videoObs.setDate((Date)jsonObject.get("timestamp"));
+
+		JSONArray pdataJArray = (JSONArray) jsonObject.get("patientsData");
+
+		//Iterating over PatientsData
+
+		Iterator arrayItr = pdataJArray.iterator();
+
+			// TODO: 20/05/2021 -cccNo and mfl code not in the model. Clinical report not in the EMR Discontinue form - How to handle?. DiscontinueData and Baseline Questionaire data - Map message to concepts.
+		while (arrayItr.hasNext()) {
+			String cccNo = (String) jsonObject.get("cccNo");
+			String mflCode = (String) jsonObject.get("mflCode");
+			videoObs.setScore((Double) jsonObject.get("adherenceScore"));
+			videoObs.setDate((Date) jsonObject.get("adherenceTime"));
+			videoObs.setPatientStatus((String) jsonObject.get("patientStatus"));
+			videoObs.setScore((Double) jsonObject.get("adherenceScore"));
+
+			Map discontinueData = ((Map) jsonObject.get("discontinueData"));
+						
+			// iterating discontinueData Map
+
+			Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
+			while (mapItr.hasNext()) {
+				Map.Entry pair = mapItr.next();
+				System.out.println(pair.getKey() + " : " + pair.getValue());
+				// TODO: 20/05/2021 Extract K,V and Create a discontinue encounter
+			}
+			// TODO: 20/05/2021 create a record per for each day
+			while (arrayItr.hasNext()){
+				videoObs.setTimeStamp((String) jsonObject.get("videosTimestamps"));
+			}
+			//
+			Map baselineQuestionnaire = ((Map) jsonObject.get("baselineQuestionnaire"));
+			Iterator<Map.Entry> baseItr = baselineQuestionnaire.entrySet().iterator();
+			while (baseItr.hasNext()) {
+				Map.Entry pair = mapItr.next();
+				System.out.println(pair.getKey() + " : " + pair.getValue());
+				// TODO: 20/05/2021 Extract K,V and Create a baselineQuestionnaire encounter
+			}
+		}
+		org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonObject
 		        .get("patientsData");
+
 		
 		List<Object> patientsData = new ArrayList<Object>();
 		patientsData.add(patientDataNode);
@@ -185,9 +226,9 @@ public class VdotDataExchange {
 				videoObs.setDate(videoObs.getDate());
 			}
 		}
-		videoObs.setTimeStamp(timestampNode.toString());
-		
-		nimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+		//videoObs.setTimeStamp(timestampNode.toString());
+
+		iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 		return "Incoming vdot data processed successfully";
 		
 	}
