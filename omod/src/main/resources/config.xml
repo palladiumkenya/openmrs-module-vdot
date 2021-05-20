@@ -104,6 +104,14 @@
 	</messages>
 	<!-- /Internationalization -->
 
+	<globalProperty>
+		<property>vdotVideoMessages.lastFetchDateAndTime</property>
+		<defaultValue>20210518120000</defaultValue>
+		<description>
+			The last date and time that the last fetch was done for vdot video messages
+		</description>
+	</globalProperty>
+
 	<mappingFiles>
 
 		NimeconfirmEnrolment.hbm.xml
