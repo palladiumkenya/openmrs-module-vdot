@@ -13,6 +13,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.openmrs.GlobalProperty;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.PatientProgram;
 import org.openmrs.Program;
 import org.openmrs.Patient;
@@ -39,55 +42,58 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.openmrs.module.vdot.util.Utils.getJsonNodeFactory;
 
 public class VdotDataExchange {
-
+	
 	private Log log = LogFactory.getLog(VdotDataExchange.class);
-
+	
+	private List<PatientIdentifierType> allPatientIdentifierTypes;
+	
 	Program vdotProgram = MetadataUtils.existing(Program.class, VdotMetadata._Program.VDOT_PROGRAM);
-
+	
 	ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
-
+	
 	public static final Locale LOCALE = Locale.ENGLISH;
-
+	
 	/**
 	 * Returns a single object details for patients enrolled in VDOT program
-	 *
+	 * 
 	 * @return
 	 */
 	public ObjectNode generatePayloadForVdot(Patient patient) {
 		Context.addProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		EncounterService encounterService = Context.getEncounterService();
-
+		
 		ObjectNode payload = getJsonNodeFactory().objectNode();
-
+		
 		String dob = patient.getBirthdate() != null ? Utils.getSimpleDateFormat("yyyy-MM-dd").format(patient.getBirthdate())
 		        : "";
-
+		
 		// get last drug regimen encounter
-
+		
 		StringBuilder q = new StringBuilder();
 		q.append("select max(e.encounter_id)");
 		q.append("from encounter e inner join \n"
 		        + "( select encounter_type_id, uuid, name from encounter_type where uuid ='7df67b83-1b84-4fe2-b1b7-794b4e9bfcc3'\n"
 		        + ") et on et.encounter_type_id=e.encounter_type\n"
 		        + "inner join orders o on o.encounter_id=e.encounter_id and o.voided=0 and o.order_action='NEW' and o.date_stopped is null and o.order_group_id is not null "
-
+		
 		);
 		q.append("where e.patient_id = " + patient.getPatientId());
-
+		
 		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
 		Integer encounterId = (Integer) queryData.get(0).get(0);
 		Encounter lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
 		String frequency = "";
-
+		
 		if (lastDrugOrderEncounter != null) {
 			for (Order order : lastDrugOrderEncounter.getOrders()) {
 				if (order != null) {
-
+					
 					DrugOrder drugOrder = (DrugOrder) order;
 					if (drugOrder.getFrequency() != null && drugOrder.getFrequency().getConcept() != null) {
 						frequency = drugOrder.getFrequency().getConcept().getShortNameInLocale(LOCALE) != null ? drugOrder
@@ -97,17 +103,17 @@ public class VdotDataExchange {
 				}
 			}
 		}
-
+		
 		CalculationResult lastViralLoad = EmrCalculationUtils.evaluateForPatient(LastViralLoadResultCalculation.class, null,
 		    patient);
 		SimpleObject vl = null;
 		if (!lastViralLoad.isEmpty()) {
 			vl = (SimpleObject) lastViralLoad.getValue();
 		}
-
+		
 		List<PatientProgram> programs = programWorkflowService.getPatientPrograms(patient, vdotProgram, null, null, null,
 		    null, true);
-
+		
 		PatientIdentifier cccNumber = patient.getPatientIdentifier(Utils.getUniquePatientNumberIdentifierType());
 		Encounter originalRegimenEncounter = RegimenMappingUtils.getFirstEncounterForProgram(patient, "ARV");
 		Encounter currentRegimenEncounter = RegimenMappingUtils.getLastEncounterForProgram(patient, "ARV");
@@ -118,14 +124,14 @@ public class VdotDataExchange {
 		ObjectNode address = Utils.getPatientAddress(patient);
 		String phoneNumber = Utils.getPatientPhoneNumber(patient);
 		String nextOfKinPhoneNumber = Utils.getPatientNextOfKinPhoneNumber(patient);
-
+		
 		String nascopCode = "";
 		if (StringUtils.isNotBlank(regimenName)) {
 			nascopCode = RegimenMappingUtils.getDrugNascopCodeByDrugNameAndRegimenLine(regimenName, regimenLine);
 		}
 		//add to list only if enrolled into vdot program
 		if (programs.size() > 0) {
-
+			
 			payload.put("facilityCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
 			payload.put("cccNo", cccNumber != null ? cccNumber.getIdentifier() : "");
 			payload.put("dob", dob);
@@ -146,83 +152,124 @@ public class VdotDataExchange {
 			payload.put("countyCode", getCountyCodes(address.get("COUNTY").textValue().toLowerCase()));
 			payload.put("subcounty", address.get("SUB_COUNTY").textValue());
 			payload.put("gender", patient.getGender());
-
+			
 		}
 		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
-
+		
 		return payload;
 	}
-
+	
 	/**
 	 * processes incoming message from vdot server *
-	 *
+	 * 
 	 * @return
 	 */
-	public String processIncomingVdotData(org.json.simple.JSONObject jsonObject) {
-
+	public String processIncomingVdotData(JSONObject jsonObject) {
+		
 		// Consume read data
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
-
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+		
 		//TODO: Need to handle duplications
-
-		videoObs.setDate((Date) jsonObject.get("timestamp"));
-		JSONArray pdataJArray = (JSONArray) jsonObject.get("patientsData");
-		//Iterating over PatientsData
-
-		Iterator arrayItr = pdataJArray.iterator();
-		// TODO: 20/05/2021 -cccNo and mfl code not in the model. Clinical report not in the EMR Discontinue form - How to handle?. DiscontinueData and Baseline Questionaire data - Map message to concepts.
-		while (arrayItr.hasNext()) {
-			String cccNo = (String) jsonObject.get("cccNo");
-			String mflCode = (String) jsonObject.get("mflCode");
-			videoObs.setScore((Double) jsonObject.get("adherenceScore"));
-			videoObs.setDate((Date) jsonObject.get("adherenceTime"));
-			videoObs.setPatientStatus((String) jsonObject.get("patientStatus"));
-			videoObs.setScore((Double) jsonObject.get("adherenceScore"));
-
-			Map discontinueData = ((Map) jsonObject.get("discontinueData"));
-
-			// iterating discontinueData Map
-
-			Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
-			while (mapItr.hasNext()) {
-				Map.Entry pair = mapItr.next();
-				System.out.println(pair.getKey() + " : " + pair.getValue());
-				// TODO: 20/05/2021 Extract K,V and Create a discontinue encounter
-			}
-			// TODO: 20/05/2021 create a record per for each day
+		// Get last time a fetch was conducted and compare with incoming timestamp
+		// to avoid fetching same messages
+		Date fetchDate = null;
+		Date timestampDate = null;
+		String message = "";
+		GlobalProperty globalPropertyObject = Context.getAdministrationService().getGlobalPropertyObject(
+		    "vdotVideoMessages.lastFetchDateAndTime");
+		
+		try {
+			String ft = globalPropertyObject.getValue().toString();
+			fetchDate = formatter.parse(ft);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// Get timestamp to compare with last run timestamp
+		try {
+			
+			String timeStamp = jsonObject.get("timestamp").toString();
+			timestampDate = formatter.parse(timeStamp);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (fetchDate.after(timestampDate)) {
+			
+			videoObs.setDate((Date) jsonObject.get("timestamp"));
+			
+			JSONArray pdataJArray = (JSONArray) jsonObject.get("patientsData");
+			
+			//Iterating over PatientsData
+			
+			Iterator arrayItr = pdataJArray.iterator();
+			// TODO: 20/05/2021 -cccNo and mfl code not in the model. Clinical report not in the EMR Discontinue form - How to handle?. DiscontinueData and Baseline Questionaire data - Map message to concepts.
 			while (arrayItr.hasNext()) {
-				videoObs.setTimeStamp((String) jsonObject.get("videosTimestamps"));
+				String cccNo = (String) jsonObject.get("cccNo");
+				String mflCode = (String) jsonObject.get("mflCode");
+				videoObs.setScore((Double) jsonObject.get("adherenceScore"));
+				videoObs.setDate((Date) jsonObject.get("adherenceTime"));
+				videoObs.setPatientStatus((String) jsonObject.get("patientStatus"));
+				videoObs.setScore((Double) jsonObject.get("adherenceScore"));
+				
+				Map discontinueData = ((Map) jsonObject.get("discontinueData"));
+				
+				// iterating discontinueData Map
+				
+				Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
+				while (mapItr.hasNext()) {
+					Map.Entry pair = mapItr.next();
+					System.out.println(pair.getKey() + " : " + pair.getValue());
+					// TODO: 20/05/2021 Extract K,V and Create a discontinue encounter
+				}
+				// TODO: 20/05/2021 create a record per for each day
+				while (arrayItr.hasNext()) {
+					videoObs.setTimeStamp((String) jsonObject.get("videosTimestamps"));
+				}
+				//
+				Map baselineQuestionnaire = ((Map) jsonObject.get("baselineQuestionnaire"));
+				Iterator<Map.Entry> baseItr = baselineQuestionnaire.entrySet().iterator();
+				while (baseItr.hasNext()) {
+					Map.Entry pair = mapItr.next();
+					System.out.println(pair.getKey() + " : " + pair.getValue());
+					// TODO: 20/05/2021 Extract K,V and Create a baselineQuestionnaire encounter
+				}
 			}
-			//
-			Map baselineQuestionnaire = ((Map) jsonObject.get("baselineQuestionnaire"));
-			Iterator<Map.Entry> baseItr = baselineQuestionnaire.entrySet().iterator();
-			while (baseItr.hasNext()) {
-				Map.Entry pair = mapItr.next();
-				System.out.println(pair.getKey() + " : " + pair.getValue());
-				// TODO: 20/05/2021 Extract K,V and Create a baselineQuestionnaire encounter
+			org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonObject
+			        .get("patientsData");
+			
+			List<Object> patientsData = new ArrayList<Object>();
+			patientsData.add(patientDataNode);
+			
+			if (patientsData.size() > 0) {
+				
+				String cccNo = (String) jsonObject.get("cccNo");
+				// Check to see a patient with similar upn number exists
+				List<Patient> patients = Context.getPatientService().getPatients(null, cccNo, allPatientIdentifierTypes,
+				    true);
+				if (patients.size() > 0) {
+					Patient patient = patients.get(0);
+					for (int i = 0; i < patientsData.size(); ++i) {
+						videoObs.setPatient(patient);
+						videoObs.setId(patient.getId());
+						videoObs.setScore(videoObs.getScore());
+						videoObs.setPatientStatus(videoObs.getPatientStatus());
+						videoObs.setDate(videoObs.getDate());
+					}
+				}
 			}
+			//videoObs.setTimeStamp(timestampNode.toString());
+			
+			iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+			message = "Incoming vdot data processed successfully";
+		} else {
+			message = "Vdot message already processed";
 		}
-		org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonObject
-		        .get("patientsData");
-
-		List<Object> patientsData = new ArrayList<Object>();
-		patientsData.add(patientDataNode);
-
-		Patient patient = videoObs.getPatient();
-		if (patientsData.size() > 0) {
-			for (int i = 0; i < patientsData.size(); ++i) {
-				videoObs.setPatient(patient);
-				videoObs.setId(patient.getId());
-				videoObs.setScore(videoObs.getScore());
-				videoObs.setPatientStatus(videoObs.getPatientStatus());
-				videoObs.setDate(videoObs.getDate());
-			}
-		}
-		//videoObs.setTimeStamp(timestampNode.toString());
-
-		iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
-		return "Incoming vdot data processed successfully";
+		return message;
 		
 	}
 	
