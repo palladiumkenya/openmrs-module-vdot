@@ -14,15 +14,8 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.openmrs.GlobalProperty;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.PatientProgram;
-import org.openmrs.Program;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.Encounter;
-import org.openmrs.Order;
-import org.openmrs.DrugOrder;
+import org.openmrs.*;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl;
@@ -52,7 +45,7 @@ public class VdotDataExchange {
 	private Log log = LogFactory.getLog(VdotDataExchange.class);
 	
 	private List<PatientIdentifierType> allPatientIdentifierTypes;
-	
+
 	Program vdotProgram = MetadataUtils.existing(Program.class, VdotMetadata._Program.VDOT_PROGRAM);
 	
 	ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
@@ -170,7 +163,18 @@ public class VdotDataExchange {
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-		
+		ConceptService cs = Context.getConceptService();
+
+		EncounterService encounterService = Context.getEncounterService();
+
+		Form vdotDiscontinuationForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION);
+		Form baselineQuestionnaireForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_BASELINE);
+
+		EncounterType baselineEncounter = encounterService
+				.getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_BASELINE_ENCOUNTER);
+
+		EncounterType discEncounter = encounterService
+				.getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION);
 		//TODO: Need to handle duplications
 		// Get last time a fetch was conducted and compare with incoming timestamp
 		// to avoid fetching same messages
@@ -179,7 +183,7 @@ public class VdotDataExchange {
 		String message = "";
 		GlobalProperty globalPropertyObject = Context.getAdministrationService().getGlobalPropertyObject(
 		    "vdotVideoMessages.lastFetchDateAndTime");
-		
+
 		try {
 			String ft = globalPropertyObject.getValue().toString();
 			fetchDate = formatter.parse(ft);
@@ -187,44 +191,63 @@ public class VdotDataExchange {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		// Get timestamp to compare with last run timestamp
 		try {
-			
+
 			String timeStamp = jsonObject.get("timestamp").toString();
 			timestampDate = formatter.parse(timeStamp);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		if (fetchDate.after(timestampDate)) {
-			
+
 			videoObs.setDate((Date) jsonObject.get("timestamp"));
-			
+
 			JSONArray pdataJArray = (JSONArray) jsonObject.get("patientsData");
-			
+
 			//Iterating over PatientsData
-			
+
 			Iterator arrayItr = pdataJArray.iterator();
 			// TODO: 20/05/2021 -cccNo and mfl code not in the model. Clinical report not in the EMR Discontinue form - How to handle?. DiscontinueData and Baseline Questionaire data - Map message to concepts.
 			while (arrayItr.hasNext()) {
+				Encounter encounter = new Encounter();
 				String cccNo = (String) jsonObject.get("cccNo");
 				String mflCode = (String) jsonObject.get("mflCode");
 				videoObs.setScore((Double) jsonObject.get("adherenceScore"));
 				videoObs.setDate((Date) jsonObject.get("adherenceTime"));
 				videoObs.setPatientStatus((String) jsonObject.get("patientStatus"));
 				videoObs.setScore((Double) jsonObject.get("adherenceScore"));
-				
+
 				Map discontinueData = ((Map) jsonObject.get("discontinueData"));
-				
+
 				// iterating discontinueData Map
-				
+
 				Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
 				while (mapItr.hasNext()) {
+					Obs o = new Obs();
 					Map.Entry pair = mapItr.next();
-					System.out.println(pair.getKey() + " : " + pair.getValue());
+					o.setConcept(cs.getConcept(conceptNameToIdMapper(jsonObject.get(pair.getKey()).toString())));
+					o.setDateCreated(new Date());
+					o.setCreator(Context.getAuthenticatedUser());
+					o.setObsDatetime(new Date());
+					o.setPerson(null);// TODO: 20/05/2021 get the patient
+					if ((conceptNameToIdMapper(jsonObject.get(pair.getKey()).toString()).equals(164384))) {
+						o.setValueDatetime((Date) pair.getValue());
+					} else if ((conceptNameToIdMapper(jsonObject.get(pair.getKey()).toString()).equals(161555))
+							|| (conceptNameToIdMapper(jsonObject.get(pair.getKey()).toString()).equals(1599))) {
+						o.setValueCoded(cs.getConcept(conceptNameToIdMapper(jsonObject.get(pair.getValue()).toString())));
+					}
+
 					// TODO: 20/05/2021 Extract K,V and Create a discontinue encounter
+					encounter.setPatient(null);// TODO: 20/05/2021 get patient
+					encounter.setEncounterType(discEncounter);
+					encounter.setEncounterDatetime(new Date());// TODO: 20/05/2021 get proper date
+					encounter.setDateCreated(new Date());
+					encounter.setForm(vdotDiscontinuationForm);
+					encounter.addObs(o);
 				}
 				// TODO: 20/05/2021 create a record per for each day
 				while (arrayItr.hasNext()) {
@@ -235,18 +258,24 @@ public class VdotDataExchange {
 				Iterator<Map.Entry> baseItr = baselineQuestionnaire.entrySet().iterator();
 				while (baseItr.hasNext()) {
 					Map.Entry pair = mapItr.next();
-					System.out.println(pair.getKey() + " : " + pair.getValue());
+					Obs o = new Obs();
 					// TODO: 20/05/2021 Extract K,V and Create a baselineQuestionnaire encounter
+					encounter.setPatient(null);// TODO: 20/05/2021 get patient
+					encounter.setEncounterType(discEncounter);
+					encounter.setEncounterDatetime(new Date());// TODO: 20/05/2021 get proper date
+					encounter.setDateCreated(new Date());
+					encounter.setForm(baselineQuestionnaireForm);
+					encounter.addObs(o);
 				}
 			}
 			org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonObject
 			        .get("patientsData");
-			
+
 			List<Object> patientsData = new ArrayList<Object>();
 			patientsData.add(patientDataNode);
-			
+
 			if (patientsData.size() > 0) {
-				
+
 				String cccNo = (String) jsonObject.get("cccNo");
 				// Check to see a patient with similar upn number exists
 				List<Patient> patients = Context.getPatientService().getPatients(null, cccNo, allPatientIdentifierTypes,
@@ -263,7 +292,7 @@ public class VdotDataExchange {
 				}
 			}
 			//videoObs.setTimeStamp(timestampNode.toString());
-			
+
 			iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 			message = "Incoming vdot data processed successfully";
 		} else {
@@ -271,6 +300,33 @@ public class VdotDataExchange {
 		}
 		return message;
 		
+	}
+	// TODO: 21/05/2021 Might need refactoring. There might be mapping methods in openmrs and this mapper may not be required
+	public static Integer conceptNameToIdMapper(String name) {
+		HashMap<String, Integer> conceptMap = new HashMap();
+		conceptMap.put("dateDiscontinued", 164384);
+		conceptMap.put("discontinuationReason", 161555);
+		conceptMap.put("Transferred Out", 159492);
+		conceptMap.put("Died", 160034);
+		conceptMap.put("Lost to Follow", 5240);
+		conceptMap.put("Cannot afford Treatment", 819);
+		conceptMap.put("Other", 5622);
+		conceptMap.put("Unknown", 1067);
+		conceptMap.put("causeOfDeath", 1599);
+		conceptMap.put("HIV disease resulting in TB", 163324);
+		conceptMap.put("HIV disease resulting in cancer", 116030);
+		conceptMap.put("HIV disease resulting in other infectious and parasitic diseases", 160159);
+		conceptMap.put("Other HIV disease resulting in other diseases or conditions leading to death", 160158);
+		conceptMap.put("Other natural causes not directly related to HIV", 133478);
+		conceptMap.put("Non-communicable diseases such as Diabetes and hypertension", 145439);
+		conceptMap.put("Non-natural causes", 123812);
+		conceptMap.put("Unknown cause", 142917);
+		if (conceptMap.containsKey(name)) {
+			return conceptMap.get(name);
+		} else {
+			return null;
+		}
+
 	}
 	
 	private String getCountyCodes(String name) {
