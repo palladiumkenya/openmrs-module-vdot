@@ -45,31 +45,31 @@ import java.net.URLConnection;
  * Controller for vdot patient data fragment
  */
 public class VdotPatientDataFragmentController {
-
+	
 	public static final String VDOT_PATIENTS_DATA_SERVER_URL = "http://197.248.92.42:88/kenyaemr/patients_data";
-
+	
 	private final Log log = LogFactory.getLog(DataManagementPageController.class);
-
+	
 	ObjectNode jsonNode = null;
-
+	
 	ObjectMapper mapper = new ObjectMapper();
-
+	
 	VdotDataExchange vdotDataExchange = new VdotDataExchange();
-
+	
 	public void controller(PageModel model) {
-
+		
 	}
-
+	
 	public String getMessagesFromVdot() {
 		boolean isOnline = false;
 		String message = "";
-
+		
 		if (checkInternetConnectionStatus()) {
 			isOnline = true;
 			try {
 				jsonNode = (ObjectNode) mapper.readTree(payloadString);
 				if (jsonNode != null) {
-
+					
 					JSONParser parser = new JSONParser();
 					try {
 						JSONObject jsonObject = (JSONObject) parser.parse(payloadString);
@@ -86,7 +86,7 @@ public class VdotPatientDataFragmentController {
 		}
 		return message;
 	}
-
+	
 	private static String getVdotNimeConfirmVideoObs() throws IOException {
 		String vdotServerUrl = Context.getAdministrationService().getGlobalProperty(VDOT_PATIENTS_DATA_SERVER_URL);
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(SSLContexts.createDefault(),
@@ -106,22 +106,22 @@ public class VdotPatientDataFragmentController {
 				if (entity != null) {
 					result = EntityUtils.toString(entity);
 				}
-
+				
 			}
 			finally {
 				response.close();
 			}
 			return result;
-
+			
 		}
 		finally {
 			httpClient.close();
 		}
 	}
-
+	
 	private boolean checkInternetConnectionStatus() {
 		boolean isConnected = false;
-
+		
 		try {
 			URL url = new URL("https://www.google.com");
 			URLConnection connection = url.openConnection();
@@ -134,12 +134,12 @@ public class VdotPatientDataFragmentController {
 		catch (IOException e) {
 			log.error("Internet is not connected");
 		}
-
+		
 		return isConnected;
 	}
-
+	
 	String payloadString = "{\n"
-	        + "  \"timestamp\" : \"\",\n"
+	        + "  \"timestamp\" : \"2021-05-20 19:01:15\",\n"
 	        + "  \"patientsData\" : [\n"
 	        + "    {\n"
 	        + "      \"cccNo\" : \"13872008237\",\n"
