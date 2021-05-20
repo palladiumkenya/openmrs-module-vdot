@@ -26,6 +26,9 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.page.controller.DataManagementPageController;
@@ -42,34 +45,40 @@ import java.net.URLConnection;
  * Controller for vdot patient data fragment
  */
 public class VdotPatientDataFragmentController {
-	
+
 	public static final String VDOT_PATIENTS_DATA_SERVER_URL = "http://197.248.92.42:88/kenyaemr/patients_data";
-	
+
 	private final Log log = LogFactory.getLog(DataManagementPageController.class);
-	
+
 	ObjectNode jsonNode = null;
-	
+
 	ObjectMapper mapper = new ObjectMapper();
-	
+
 	VdotDataExchange vdotDataExchange = new VdotDataExchange();
-	
+
 	public void controller(PageModel model) {
-		
+
 	}
-	
+
 	public String getMessagesFromVdot() {
 		boolean isOnline = false;
 		String message = "";
-		
+
 		if (checkInternetConnectionStatus()) {
 			isOnline = true;
 			try {
-				//jsonNode = (ObjectNode) mapper.readTree(getVdotNimeConfirmVideoObs());
-				jsonNode = (ObjectNode) mapper.readTree(payload);
+				jsonNode = (ObjectNode) mapper.readTree(payloadString);
 				if (jsonNode != null) {
-					message = vdotDataExchange.processIncomingVdotData(payload);
+
+					JSONParser parser = new JSONParser();
+					try {
+						JSONObject jsonObject = (JSONObject) parser.parse(payloadString);
+						message = vdotDataExchange.processIncomingVdotData(jsonObject);
+					}
+					catch (ParseException e) {
+						e.printStackTrace();
+					}
 				}
-				
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -77,7 +86,7 @@ public class VdotPatientDataFragmentController {
 		}
 		return message;
 	}
-	
+
 	private static String getVdotNimeConfirmVideoObs() throws IOException {
 		String vdotServerUrl = Context.getAdministrationService().getGlobalProperty(VDOT_PATIENTS_DATA_SERVER_URL);
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(SSLContexts.createDefault(),
@@ -97,22 +106,22 @@ public class VdotPatientDataFragmentController {
 				if (entity != null) {
 					result = EntityUtils.toString(entity);
 				}
-				
+
 			}
 			finally {
 				response.close();
 			}
 			return result;
-			
+
 		}
 		finally {
 			httpClient.close();
 		}
 	}
-	
+
 	private boolean checkInternetConnectionStatus() {
 		boolean isConnected = false;
-		
+
 		try {
 			URL url = new URL("https://www.google.com");
 			URLConnection connection = url.openConnection();
@@ -125,11 +134,11 @@ public class VdotPatientDataFragmentController {
 		catch (IOException e) {
 			log.error("Internet is not connected");
 		}
-		
+
 		return isConnected;
 	}
-	
-	String payload = "{\n"
+
+	String payloadString = "{\n"
 	        + "  \"timestamp\" : \"\",\n"
 	        + "  \"patientsData\" : [\n"
 	        + "    {\n"
