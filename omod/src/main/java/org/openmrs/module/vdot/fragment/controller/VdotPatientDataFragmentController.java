@@ -64,9 +64,10 @@ public class VdotPatientDataFragmentController {
 		if (checkInternetConnectionStatus()) {
 			isOnline = true;
 			try {
-				jsonNode = (ObjectNode) mapper.readTree(getVdotNimeConfirmVideoObs());
+				//jsonNode = (ObjectNode) mapper.readTree(getVdotNimeConfirmVideoObs());
+				jsonNode = (ObjectNode) mapper.readTree(payload);
 				if (jsonNode != null) {
-					message = vdotDataExchange.processIncomingVdotData(jsonNode);
+					message = vdotDataExchange.processIncomingVdotData(payload);
 				}
 				
 			}
@@ -127,4 +128,66 @@ public class VdotPatientDataFragmentController {
 		
 		return isConnected;
 	}
+	
+	String payload = "{\n"
+	        + "  \"timestamp\" : \"\",\n"
+	        + "  \"patientsData\" : [\n"
+	        + "    {\n"
+	        + "      \"cccNo\" : \"13872008237\",\n"
+	        + "      \"mflCode\" : 12345,\n"
+	        + "      \"adherenceScore\" : 84.45,\n"
+	        + "      \"adherenceTime\": \"2021-05-01 19:01:15\",\n"
+	        + "      \"patientStatus\" : \"Discontinued\",\n"
+	        + "      \"discontinueData\" : {\n"
+	        + "        \"dateDiscontinued\" : \"2021-04-16\",\n"
+	        + "        \"discontinuationReason\" : \"Died\",\n"
+	        + "        \"causeOfDeath\" : \"Other HIV disease resulting in other diseases or conditions leading to death\",\n"
+	        + "        \"clinical_report\" : \"The patient .......\"\n"
+	        + "      },\n"
+	        + "      \"videosTimestamps\" : [\n"
+	        + "        \"2021-04-20 19:01:15\", \"2021-04-21 07:00:55\", \"2021-04-21 18:52:30\", \"2021-04-22 07:07:28\", \"2021-04-22 18:58:56\", \"2021-04-23 06:55:45\", \"2021-04-23 18:37:52\", \"2021-04-24 06:51:42\", \"2021-04-24 18:59:00\", \"2021-04-25 06:52:00\", \"2021-04-25 18:56:13\", \"2021-04-26 06:59:41\", \"2021-04-27 06:45:30\", \"2021-04-27 18:54:07\", \"2021-04-28 06:46:26\", \"2021-04-28 18:51:01\", \"2021-04-29 06:41:41\"\n"
+	        + "      ],\n"
+	        + "      \"baselineQuestionnaire\" : {\n"
+	        + "        \"primaryCaregiver\" : \"\",\n"
+	        + "        \"livesWith\" : \"\" ,\n"
+	        + "        \"isAwareOfChildHivStatus\" : \"\",\n"
+	        + "        \"othersWithHivAtHome\" : \"\",\n"
+	        + "        \"totalAtHome\" : \"\",\n"
+	        + "        \"goesToSchool\" :  \"\",\n"
+	        + "        \"schoolLevel\" :  \"\",\n"
+	        + "        \"Boards\" : \"\",\n"
+	        + "        \"SchoolDistance\" : \"\",\n"
+	        + "        \"meansOfTransport\" : \"\",\n"
+	        + "        \"incomeSource\" :  \"\",\n"
+	        + "        \"incomeAmount\" : \"\",\n"
+	        + "        \"toiletAccess\" : \"\",\n"
+	        + "        \"sourceOfWater\" : \"\",\n"
+	        + "        \"noOfMeals\" : \"\"\n"
+	        + "      }\n"
+	        + "    },\n"
+	        + "    {\n"
+	        + "      \"cccNo\" : \"11222334456\",\n"
+	        + "      \"mflCode\" : 12345,\n"
+	        + "      \"adherenceScore\" : 84.45,\n"
+	        + "      \"adherenceTime\": \"2021-05-01 19:01:15\",\n"
+	        + "      \"patientStatus\" : \"Discontinued\",\n"
+	        + "      \"discontinueData\" : {\n"
+	        + "        \"dateDiscontinued\" : \"2021-04-23\",\n"
+	        + "        \"discontinuationReason\" : \"Transferred out\",\n"
+	        + "        \"facilityTransferredToCode\" : 23098,\n"
+	        + "        \"clinical_report\" : \"The patient .......\"\n"
+	        + "      },\n"
+	        + "      \"videosTimestamps\" : [\n"
+	        + "        \"2021-04-20 19:01:15\", \"2021-04-21 07:00:55\", \"2021-04-21 18:52:30\", \"2021-04-22 07:07:28\", \"2021-04-22 18:58:56\", \"2021-04-23 06:55:45\", \"2021-04-23 18:37:52\", \"2021-04-24 06:51:42\", \"2021-04-24 18:59:00\", \"2021-04-25 06:52:00\", \"2021-04-25 18:56:13\", \"2021-04-26 06:59:41\", \"2021-04-27 06:45:30\", \"2021-04-27 18:54:07\", \"2021-04-28 06:46:26\", \"2021-04-28 18:51:01\", \"2021-04-29 06:41:41\"\n"
+	        + "      ]\n"
+	        + "    },\n"
+	        + "    {\n"
+	        + "      \"cccNo\" : \"11222334457\",\n"
+	        + "      \"mflCode\" : 12345,\n"
+	        + "      \"adherenceScore\" : 84.45,\n"
+	        + "      \"adherenceTime\": \"2021-05-01 19:01:15\",\n"
+	        + "      \"patientStatus\" : \"Active\",\n"
+	        + "      \"videosTimestamps\" : [\n"
+	        + "        \"2021-04-20 19:01:15\", \"2021-04-21 07:00:55\", \"2021-04-21 18:52:30\", \"2021-04-22 07:07:28\", \"2021-04-22 18:58:56\", \"2021-04-23 06:55:45\", \"2021-04-23 18:37:52\", \"2021-04-24 06:51:42\", \"2021-04-24 18:59:00\", \"2021-04-25 06:52:00\", \"2021-04-25 18:56:13\", \"2021-04-26 06:59:41\", \"2021-04-27 06:45:30\", \"2021-04-27 18:54:07\", \"2021-04-28 06:46:26\", \"2021-04-28 18:51:01\", \"2021-04-29 06:41:41\"\n"
+	        + "      ]\n" + "    }\n" + "  ]\n" + "}";
 }
