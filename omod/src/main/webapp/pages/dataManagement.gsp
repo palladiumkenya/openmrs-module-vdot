@@ -32,7 +32,7 @@
 
 <div class="ke-page-content">
     <div class="mainBox boxStyle">
-        Something here for pushing data
+        ${ ui.includeFragment("vdot", "vdotEnrollmentStats") }
 
 
 
