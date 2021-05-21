@@ -1,15 +1,20 @@
 package org.openmrs.module.vdot.vdotDataExchange;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+//import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BaseJsonNode;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.node.JsonNodeFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.openmrs.GlobalProperty;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PatientProgram;
 import org.openmrs.Program;
@@ -37,13 +42,8 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.openmrs.module.vdot.util.Utils.getJsonNodeFactory;
 
@@ -51,11 +51,11 @@ public class VdotDataExchange {
 	
 	private Log log = LogFactory.getLog(VdotDataExchange.class);
 	
+	private List<PatientIdentifierType> allPatientIdentifierTypes;
+	
 	Program vdotProgram = MetadataUtils.existing(Program.class, VdotMetadata._Program.VDOT_PROGRAM);
 	
 	ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
-	
-	private List<PatientIdentifierType> allPatientIdentifierTypes;
 	
 	public static final Locale LOCALE = Locale.ENGLISH;
 	
@@ -87,10 +87,7 @@ public class VdotDataExchange {
 		
 		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
 		Integer encounterId = (Integer) queryData.get(0).get(0);
-		Encounter lastDrugOrderEncounter = null;
-		if (encounterId != null) {
-			lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
-		}
+		Encounter lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
 		String frequency = "";
 		
 		if (lastDrugOrderEncounter != null) {
@@ -138,13 +135,12 @@ public class VdotDataExchange {
 			payload.put("facilityCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
 			payload.put("cccNo", cccNumber != null ? cccNumber.getIdentifier() : "");
 			payload.put("dob", dob);
-			payload.put("regimen", nascopCode != null || StringUtils.isNotBlank(nascopCode) ? nascopCode
-			        : regimenName != null ? regimenName : "");
+			payload.put("regimen", regimenName.replace("/", "+"));
 			// payload.put("drug_code", nascopCode != null ? nascopCode : "");
 			payload.put("phoneNumber", phoneNumber != null || StringUtils.isNotBlank(phoneNumber) ? phoneNumber
 			        : nextOfKinPhoneNumber != null ? nextOfKinPhoneNumber : "");
 			payload.put("firstName", patient.getGivenName());
-			payload.put("middleName", patient.getMiddleName() != null ? patient.getMiddleName() : "");
+			payload.put("middleName", patient.getMiddleName());
 			payload.put("surname", patient.getFamilyName());
 			payload.put("currentVl",
 			    vl != null && vl.get("lastVl") != null ? vl.get("lastVl").toString().replace("copies/ml", "") : "");
@@ -168,47 +164,110 @@ public class VdotDataExchange {
 	 * 
 	 * @return
 	 */
-	public String processIncomingVdotData(String payload) {
+	public String processIncomingVdotData(JSONObject jsonObject) {
 		
 		// Consume read data
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
-		String message = "";
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
 		
 		//TODO: Need to handle duplications
-		org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
+		// Get last time a fetch was conducted and compare with incoming timestamp
+		// to avoid fetching same messages
+		Date fetchDate = null;
+		Date timestampDate = null;
+		String message = "";
+		GlobalProperty globalPropertyObject = Context.getAdministrationService().getGlobalPropertyObject(
+		    "vdotVideoMessages.lastFetchDateAndTime");
+		
 		try {
-			org.codehaus.jackson.node.ArrayNode patientDataArray = (org.codehaus.jackson.node.ArrayNode) mapper
-			        .readTree(payload);
-			for (Iterator<org.codehaus.jackson.JsonNode> it = patientDataArray.iterator(); it.hasNext();) {
-				org.codehaus.jackson.node.ObjectNode node = (org.codehaus.jackson.node.ObjectNode) it.next();
+			String ft = globalPropertyObject.getValue().toString();
+			fetchDate = formatter.parse(ft);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// Get timestamp to compare with last run timestamp
+		try {
+			
+			String timeStamp = jsonObject.get("timestamp").toString();
+			timestampDate = formatter.parse(timeStamp);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (fetchDate.after(timestampDate)) {
+			
+			videoObs.setDate((Date) jsonObject.get("timestamp"));
+			
+			JSONArray pdataJArray = (JSONArray) jsonObject.get("patientsData");
+			
+			//Iterating over PatientsData
+			
+			Iterator arrayItr = pdataJArray.iterator();
+			// TODO: 20/05/2021 -cccNo and mfl code not in the model. Clinical report not in the EMR Discontinue form - How to handle?. DiscontinueData and Baseline Questionaire data - Map message to concepts.
+			while (arrayItr.hasNext()) {
+				String cccNo = (String) jsonObject.get("cccNo");
+				String mflCode = (String) jsonObject.get("mflCode");
+				videoObs.setScore((Double) jsonObject.get("adherenceScore"));
+				videoObs.setDate((Date) jsonObject.get("adherenceTime"));
+				videoObs.setPatientStatus((String) jsonObject.get("patientStatus"));
+				videoObs.setScore((Double) jsonObject.get("adherenceScore"));
 				
-				String cccNo = node.get("cccNo").asText();
+				Map discontinueData = ((Map) jsonObject.get("discontinueData"));
+				
+				// iterating discontinueData Map
+				
+				Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
+				while (mapItr.hasNext()) {
+					Map.Entry pair = mapItr.next();
+					System.out.println(pair.getKey() + " : " + pair.getValue());
+					// TODO: 20/05/2021 Extract K,V and Create a discontinue encounter
+				}
+				// TODO: 20/05/2021 create a record per for each day
+				while (arrayItr.hasNext()) {
+					videoObs.setTimeStamp((String) jsonObject.get("videosTimestamps"));
+				}
+				//
+				Map baselineQuestionnaire = ((Map) jsonObject.get("baselineQuestionnaire"));
+				Iterator<Map.Entry> baseItr = baselineQuestionnaire.entrySet().iterator();
+				while (baseItr.hasNext()) {
+					Map.Entry pair = mapItr.next();
+					System.out.println(pair.getKey() + " : " + pair.getValue());
+					// TODO: 20/05/2021 Extract K,V and Create a baselineQuestionnaire encounter
+				}
+			}
+			org.codehaus.jackson.node.ArrayNode patientDataNode = (org.codehaus.jackson.node.ArrayNode) jsonObject
+			        .get("patientsData");
+			
+			List<Object> patientsData = new ArrayList<Object>();
+			patientsData.add(patientDataNode);
+			
+			if (patientsData.size() > 0) {
+				
+				String cccNo = (String) jsonObject.get("cccNo");
 				// Check to see a patient with similar upn number exists
 				List<Patient> patients = Context.getPatientService().getPatients(null, cccNo, allPatientIdentifierTypes,
 				    true);
 				if (patients.size() > 0) {
 					Patient patient = patients.get(0);
-					
-					Double score = node.get("adherenceScore").asDouble();
-					String patientStatus = node.get("patientStatus").asText();
-					String timeStamp = node.get("videosTimestamps").asText();
-					
-					videoObs.setPatient(patient);
-					videoObs.setId(patient.getId());
-					videoObs.setScore(score);
-					videoObs.setPatientStatus(patientStatus);
-					videoObs.setTimeStamp(timeStamp);
-					
-					iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
-					message = "Successfully updated Vdot video obs";
-				} else {
-					message = "The ccc number for patient doesnt exist";
+					for (int i = 0; i < patientsData.size(); ++i) {
+						videoObs.setPatient(patient);
+						videoObs.setId(patient.getId());
+						videoObs.setScore(videoObs.getScore());
+						videoObs.setPatientStatus(videoObs.getPatientStatus());
+						videoObs.setDate(videoObs.getDate());
+					}
 				}
 			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
+			//videoObs.setTimeStamp(timestampNode.toString());
+			
+			iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+			message = "Incoming vdot data processed successfully";
+		} else {
+			message = "Vdot message already processed";
 		}
 		return message;
 		

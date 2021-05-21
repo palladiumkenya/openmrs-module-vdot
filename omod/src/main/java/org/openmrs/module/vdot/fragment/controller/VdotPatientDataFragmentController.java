@@ -26,6 +26,9 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.page.controller.DataManagementPageController;
@@ -64,12 +67,18 @@ public class VdotPatientDataFragmentController {
 		if (checkInternetConnectionStatus()) {
 			isOnline = true;
 			try {
-				//jsonNode = (ObjectNode) mapper.readTree(getVdotNimeConfirmVideoObs());
-				jsonNode = (ObjectNode) mapper.readTree(payload);
+				jsonNode = (ObjectNode) mapper.readTree(payloadString);
 				if (jsonNode != null) {
-					message = vdotDataExchange.processIncomingVdotData(payload);
+					
+					JSONParser parser = new JSONParser();
+					try {
+						JSONObject jsonObject = (JSONObject) parser.parse(payloadString);
+						message = vdotDataExchange.processIncomingVdotData(jsonObject);
+					}
+					catch (ParseException e) {
+						e.printStackTrace();
+					}
 				}
-				
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -129,8 +138,8 @@ public class VdotPatientDataFragmentController {
 		return isConnected;
 	}
 	
-	String payload = "{\n"
-	        + "  \"timestamp\" : \"\",\n"
+	String payloadString = "{\n"
+	        + "  \"timestamp\" : \"2021-05-20 19:01:15\",\n"
 	        + "  \"patientsData\" : [\n"
 	        + "    {\n"
 	        + "      \"cccNo\" : \"13872008237\",\n"
