@@ -34,13 +34,16 @@
     <div class="mainBox boxStyle">
         ${ ui.includeFragment("vdot", "vdotEnrollmentStats") }
 
+        <br/>
+        <br/>
+        <% if (pendingEnrollments > 0) { %>
+        <button id="postMessagetoNimeConfirm">Push Enrollment(s) to nimeConfirm</button>
+        <span id="msgBox"></span>
+        <% } else { %>
+        <span >No new enrollment(s) to push to nimeConfirm</span>
 
 
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <button id="postMessagetoNimeConfirm">Push data</button>
+            <% } %>
 
     </div>
     <div class="mainBox boxStyle">
