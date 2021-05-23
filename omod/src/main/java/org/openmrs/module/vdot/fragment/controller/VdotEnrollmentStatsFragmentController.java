@@ -27,7 +27,7 @@ public class VdotEnrollmentStatsFragmentController {
 		Long totalProcessedEnrollment = (Long) Context.getAdministrationService().executeSQL(allProcessedEnrollment, true)
 		        .get(0).get(0);
 		Long pendingEnrols = (Long) Context.getAdministrationService().executeSQL(pendingEnrollment, true).get(0).get(0);
-
+		
 		model.put("totalProcessed", totalProcessedEnrollment.intValue());
 		model.put("pendingEnrollments", pendingEnrols.intValue());
 		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);

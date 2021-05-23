@@ -14,6 +14,7 @@
 
 package org.openmrs.module.vdot.fragment.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -119,8 +120,8 @@ public class VdotPatientObservationsFragmentController {
 								int statusCode = response.getStatusLine().getStatusCode();
 								if (statusCode == 429) { // too many requests. just terminate
 									System.out
-									        .println("The push lab scheduler has been configured to run at very short intervals. Please change this to at least 30min");
-									log.warn("The push scheduler has been configured to run at very short intervals. Please change this to at least 30min");
+									        .println("Many requests please terminate");
+									log.warn("Many requests please terminate");
 									return;
 								}
 								
