@@ -1,5 +1,7 @@
 package org.openmrs.module.vdot.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openmrs.Patient;
@@ -16,10 +18,16 @@ import org.openmrs.util.PrivilegeConstants;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 import java.util.List;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
 	
@@ -188,5 +196,29 @@ public class Utils {
 			
 		}
 		return requestBodyJsonStr;
+	}
+	
+	public static HashMap<String, List<String>> groupVideoTimeStampsByDay(String timeStamps) throws ParseException,
+	        JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		
+		List<String> sList = mapper.readValue(timeStamps, new TypeReference<List<String>>() {});
+		
+		HashMap<String, List<String>> groupedTimeStamps = new HashMap<String, List<String>>();
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
+		for (String ts : sList) {
+			cal.setTime(formatter.parse(ts));
+			cal.set(cal.HOUR_OF_DAY, 0);
+			cal.set(cal.MINUTE, 0);
+			cal.set(cal.SECOND, 0);
+			cal.set(cal.MILLISECOND, 0);
+			
+			if (!groupedTimeStamps.containsKey(formatter.format(cal.getTime()))) {
+				groupedTimeStamps.put(formatter.format(cal.getTime()), new ArrayList<String>());
+			}
+			groupedTimeStamps.get(formatter.format(cal.getTime())).add(ts);
+		}
+		return groupedTimeStamps;
 	}
 }

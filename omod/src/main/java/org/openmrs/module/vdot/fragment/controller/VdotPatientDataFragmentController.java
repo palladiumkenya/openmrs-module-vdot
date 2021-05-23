@@ -24,8 +24,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
+//import org.codehaus.jackson.map.ObjectMapper;
+//import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -70,14 +73,9 @@ public class VdotPatientDataFragmentController {
 				jsonNode = (ObjectNode) mapper.readTree(payloadString);
 				if (jsonNode != null) {
 					
-					JSONParser parser = new JSONParser();
-					try {
-						JSONObject jsonObject = (JSONObject) parser.parse(payloadString);
-						message = vdotDataExchange.processIncomingVdotData(jsonObject);
-					}
-					catch (ParseException e) {
-						e.printStackTrace();
-					}
+					//message = vdotDataExchange.processIncomingVdotData(jsonNode);
+					message = vdotDataExchange.saveNimeConfirmVideoObs(jsonNode);
+					
 				}
 			}
 			catch (IOException e) {
@@ -142,7 +140,7 @@ public class VdotPatientDataFragmentController {
 	        + "  \"timestamp\" : \"2021-05-20 19:01:15\",\n"
 	        + "  \"patientsData\" : [\n"
 	        + "    {\n"
-	        + "      \"cccNo\" : \"13872008237\",\n"
+	        + "      \"cccNo\" : \"1315603953\",\n"
 	        + "      \"mflCode\" : 12345,\n"
 	        + "      \"adherenceScore\" : 84.45,\n"
 	        + "      \"adherenceTime\": \"2021-05-01 19:01:15\",\n"
@@ -175,7 +173,7 @@ public class VdotPatientDataFragmentController {
 	        + "      }\n"
 	        + "    },\n"
 	        + "    {\n"
-	        + "      \"cccNo\" : \"11222334456\",\n"
+	        + "      \"cccNo\" : \"1315602728\",\n"
 	        + "      \"mflCode\" : 12345,\n"
 	        + "      \"adherenceScore\" : 84.45,\n"
 	        + "      \"adherenceTime\": \"2021-05-01 19:01:15\",\n"
