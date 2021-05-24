@@ -32,15 +32,19 @@
 
 <div class="ke-page-content">
     <div class="mainBox boxStyle">
-        Something here for pushing data
-
-
+        ${ ui.includeFragment("vdot", "vdotEnrollmentStats") }
 
         <br/>
         <br/>
-        <br/>
-        <br/>
-        <button>Push data</button>
+        <% if (pendingEnrollments > 0) { %>
+        <button id="postMessagetoNimeConfirm">Push Enrollment(s) to nimeConfirm</button>
+        <span id="msgBox"></span>
+        <% } else { %>
+        <span >No new enrollment(s) to push to nimeConfirm</span>
+
+
+            <% } %>
+
     </div>
     <div class="mainBox boxStyle">
         Something here for pulling data

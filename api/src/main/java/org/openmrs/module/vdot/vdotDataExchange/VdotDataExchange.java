@@ -1,5 +1,6 @@
 package org.openmrs.module.vdot.vdotDataExchange;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -331,6 +332,54 @@ public class VdotDataExchange {
 		}
 		
 		return countyCode;
+	}
+	
+	public String saveNimeConfirmVideoObs(ObjectNode payload) {
+		String message = "";
+		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
+		
+		ArrayNode patientArrayNode = (ArrayNode) payload.get("patientsData");
+		if (patientArrayNode.size() > 0) {
+			for (int i = 0; i < patientArrayNode.size(); i++) {
+				String ccc = patientArrayNode.get(i).get("cccNo").textValue();
+				Patient patient = Context.getPatientService().identifierInUse(ccc,
+				    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
+				Map<String, List<String>> groupedVideoTimeStamps = null;
+				try {
+					
+					groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i).get("videosTimestamps")
+					        .toString());
+					if (groupedVideoTimeStamps != null) {
+						for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
+							NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
+							Date date = new Date();
+							
+							if (patient != null) {
+								videoObs.setTimeStamp(entry.getValue().toString());
+								videoObs.setPatient(patient);
+								videoObs.setPatientStatus("test");
+								videoObs.setDate(date); // should be changed to the correct date
+								iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+								message = "Incoming vdot data processed successfully";
+								
+							}
+						}
+						
+					}
+					
+				}
+				catch (ParseException e) {
+					e.printStackTrace();
+				}
+				catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		
+		return message;
+		
 	}
 	
 }

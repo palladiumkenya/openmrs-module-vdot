@@ -15,10 +15,12 @@
 package org.openmrs.module.vdot.page.controller;
 
 import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyaui.annotation.AppPage;
 import org.openmrs.module.vdot.VdotConstants;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
+import org.openmrs.util.PrivilegeConstants;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -27,7 +29,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 @AppPage(VdotConstants.APP_VDOT)
 public class DataManagementPageController {
 	
-	public void controller() {
+	public void controller(PageModel model) {
+		Context.addProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
+		
+		String pendingEnrollment = "select count(*) from kenyaemr_vdot_nimeconfirm_enrolment where status='Pending';";
+		Long pendingEnrols = (Long) Context.getAdministrationService().executeSQL(pendingEnrollment, true).get(0).get(0);
+		model.put("pendingEnrollments", pendingEnrols.intValue());
+		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		
 	}
 }
