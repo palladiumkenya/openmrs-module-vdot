@@ -2,6 +2,7 @@ package org.openmrs.module.vdot.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.openmrs.Patient;
@@ -20,14 +21,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.List;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
 	

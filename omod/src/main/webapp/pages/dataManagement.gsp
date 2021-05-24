@@ -34,13 +34,16 @@
     <div class="mainBox boxStyle">
         ${ ui.includeFragment("vdot", "vdotEnrollmentStats") }
 
+        <br/>
+        <br/>
+        <% if (pendingEnrollments > 0) { %>
+        <button id="postMessagetoNimeConfirm">Push Enrollment(s) to nimeConfirm</button>
+        <span id="msgBox"></span>
+        <% } else { %>
+        <span >No new enrollment(s) to push to nimeConfirm</span>
 
 
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <button id="postMessagetoNimeConfirm">Push data</button>
+            <% } %>
 
     </div>
     <div class="mainBox boxStyle">
@@ -72,17 +75,5 @@
                 })
         });
 
-    });
-
-    jq(function() {
-        jq('#postMessagetoNimeConfirm').click(function() {
-            jq.getJSON('${ ui.actionLink("vdot", "vdotPatientObservations", "postEnrollmentMessage") }')
-                .success(function(data) {
-                    jq('#msgBox').html("Successfully posted to nimeConfirm");
-                })
-                .error(function(xhr, status, err) {
-                    jq('#msgBox').html("Could not post to nimeConfirm. Kindly contact an admin user for help");
-                })
-        });
     });
 </script>

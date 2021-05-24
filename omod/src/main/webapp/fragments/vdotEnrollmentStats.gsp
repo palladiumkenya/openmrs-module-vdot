@@ -1,5 +1,4 @@
 <%
-    //ui.decorateWith("kenyaui", "panel", [ heading: "mUzima Queue Summary" ])
 %>
 <style>
 .simple-table {
@@ -30,7 +29,7 @@
     <fieldset>
         <legend>nimeConfirm Enrollment statistics</legend>
         <div>
-            <table class="simple-table">
+            <table class="simple-table" width="100%">
                 <thead>
                 <th width="50%">Enrollments</th>
                 <th width="40%">Total</th>
