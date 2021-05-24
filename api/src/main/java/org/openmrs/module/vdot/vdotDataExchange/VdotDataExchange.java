@@ -216,6 +216,7 @@ public class VdotDataExchange {
 						    allPatientIdentifierTypes, true);
 						if (patients.size() > 0) {
 							Patient patient = patients.get(0);
+							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");
 							Map<String, List<String>> groupedVideoTimeStamps = null;
 							try {
 								
@@ -224,18 +225,17 @@ public class VdotDataExchange {
 								if (groupedVideoTimeStamps != null) {
 									for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
 										NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
-										Date date = new Date();
-										
-										if (patient != null) {
-											videoObs.setTimeStamp(entry.getValue().toString());
+										List<String> vTimestamps = (List<String>) entry.getValue();
+										if (patient != null && vTimestamps.size() > 0) {
+											
+											videoObs.setTimeStamp(StringUtils.join(vTimestamps, ","));
 											videoObs.setPatient(patient);
 											videoObs.setId(patient.getId());
 											videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
 											videoObs.setPatientStatus(patientArrayNode.get(i).get("patientStatus").asText());
-											videoObs.setDate(date); // should be changed to the correct date
+											videoObs.setDate(vformatter.parse(entry.getKey().toString()));
 											iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 											message = "Incoming vdot data processed successfully";
-											
 										}
 									}
 									
@@ -258,7 +258,9 @@ public class VdotDataExchange {
 				e.printStackTrace();
 			}
 		}
-		
+		Date nextFetchDate = new Date();
+		globalPropertyObject.setPropertyValue(formatter.format(nextFetchDate));
+		Context.getAdministrationService().saveGlobalProperty(globalPropertyObject);
 		return message;
 		
 	}
