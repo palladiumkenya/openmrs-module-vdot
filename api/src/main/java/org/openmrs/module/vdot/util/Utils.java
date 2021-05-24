@@ -220,4 +220,84 @@ public class Utils {
 		}
 		return groupedTimeStamps;
 	}
+
+	public static Integer conceptNameToIdMapper(String name) {
+		HashMap<String, Integer> conceptMap = new HashMap();
+		conceptMap.put("dateDiscontinued", 164384);
+		conceptMap.put("discontinuationReason", 161555);
+		conceptMap.put("causeOfDeath", 1599);
+		conceptMap.put("primaryCaregiver", 160640);
+		conceptMap.put("livesWith", 159892);
+		conceptMap.put("isAwareOfChildHivStatus", 159424);
+		conceptMap.put("othersWithHivAtHome", 5587);
+		conceptMap.put("schoolLevel", 1712);
+		conceptMap.put("schType", 159928);
+		conceptMap.put("meansOfTransport", 1375);
+		conceptMap.put("incomeSource", 159740);
+		conceptMap.put("sourceOfWater", 1511);
+		//numeric
+		conceptMap.put("incomeAmount", 159776);
+		conceptMap.put("totalAtHome", 1474);
+		conceptMap.put("SchoolDistance", 1811);
+		conceptMap.put("noOfMeals", 162523);
+		//value boolean
+		conceptMap.put("goesToSchool", 5629);
+		conceptMap.put("toiletAccess", 159389);
+		if (conceptMap.containsKey(name)) {
+			return conceptMap.get(name);
+		} else {
+			return null;
+		}
+	}
+
+	public static Integer ansConceptNameToIdMapper(String name) {
+		HashMap<String, Integer> conceptMap = new HashMap();
+		conceptMap.put("Transferred Out", 159492);
+		conceptMap.put("Died", 160034);
+		conceptMap.put("Lost to Follow", 5240);
+		conceptMap.put("Cannot afford Treatment", 819);
+		conceptMap.put("Other", 5622);
+		conceptMap.put("Unknown", 1067);
+		conceptMap.put("HIV disease resulting in TB", 163324);
+		conceptMap.put("HIV disease resulting in cancer", 116030);
+		conceptMap.put("HIV disease resulting in other infectious and parasitic diseases", 160159);
+		conceptMap.put("Other HIV disease resulting in other diseases or conditions leading to death", 160158);
+		conceptMap.put("Other natural causes not directly related to HIV", 133478);
+		conceptMap.put("Non-communicable diseases such as Diabetes and hypertension", 145439);
+		conceptMap.put("Non-natural causes", 123812);
+		conceptMap.put("Unknown cause", 142917);
+		conceptMap.put("Parent", 1527);
+		conceptMap.put("Grand Parent", 973);
+		conceptMap.put("Foster parent", 159894);
+		conceptMap.put("Relative", 5620);
+		conceptMap.put("Sibling", 972);
+		conceptMap.put("Guardian", 160639);
+		conceptMap.put("none", 1107);
+		conceptMap.put("Pre-primary", 160289);
+		conceptMap.put("Primary", 1713);
+		conceptMap.put("Secondary", 1714);
+		conceptMap.put("Tertiary", 159785);
+		conceptMap.put("Boards", 164211);
+		conceptMap.put("day", 164210);
+		conceptMap.put("Walk", 159310);
+		conceptMap.put("Motorbike", 159744);
+		conceptMap.put("Bicycle", 159748);
+		conceptMap.put("Public transport", 1787);
+		conceptMap.put("School bus", 162710);
+		conceptMap.put("Business", 159673);
+		conceptMap.put("Formal employment", 1540);
+		conceptMap.put("Casual labour", 159613);
+		conceptMap.put("Farming", 1538);
+		conceptMap.put("Piped water", 1697);
+		conceptMap.put("Rain water", 1508);
+		conceptMap.put("River", 1506);
+		conceptMap.put("Borehole", 1510);
+		conceptMap.put("Well", 1509);
+		if (conceptMap.containsKey(name)) {
+			return conceptMap.get(name);
+		} else {
+			return null;
+		}
+	}
+
 }

@@ -38,7 +38,9 @@ public class VdotMetadata extends AbstractMetadataBundle {
 	
 	public static final String VDOT_PWD = "vdot.login_pwd";
 	
-	public static final String VDOT_LAST_PATIENT_ENTRY = "vdot.lastVdotEnrollment";
+	//public static final String GP_IL_LAST_PHARMACY_MESSAGE_ENCOUNTER = "kenyaemrIL.lastPharmacyMessageEncounter";
+	
+	public static final String VDOT_LAST_ENROLLMENT_ENCOUNTER = "vdot.lastVdotEnrollment";
 	
 	public static final class _EncounterType {
 		
@@ -96,7 +98,7 @@ public class VdotMetadata extends AbstractMetadataBundle {
 		install(globalProperty(VDOT_PWD, "Vdot pwd", null));
 		install(globalProperty(VDOT_ENROLLMENT_POST_API, "Vdot endpoint for posting enrollment information", null));
 		install(globalProperty(VDOT_OBSERVATION_GET_API, "Vdot endpoint for getting video observations", null));
-		install(globalProperty(VDOT_LAST_PATIENT_ENTRY, "Vdot last patient entry id", null));
+		install(globalProperty(VDOT_LAST_ENROLLMENT_ENCOUNTER, "Vdot last enrollment encounter id", null));
 		
 	}
 }

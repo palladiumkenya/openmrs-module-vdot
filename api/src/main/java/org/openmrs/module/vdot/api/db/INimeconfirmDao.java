@@ -18,6 +18,10 @@ public interface INimeconfirmDao {
 	
 	List<NimeconfirmEnrolment> getNimeconfirmEnrolment();
 	
+	List<NimeconfirmEnrolment> getNimeconfirmEnrolmentsToSend(NimeconfirmEnrolment enrolment);
+	
+	NimeconfirmEnrolment getNimeconfirmEnrolmentByStatus(String status);
+	
 	void voidNimeconfirmEnrolment(int id);
 	
 	NimeconfirmEnrolment getNimeconfirmEnrolmentByID(Integer id);

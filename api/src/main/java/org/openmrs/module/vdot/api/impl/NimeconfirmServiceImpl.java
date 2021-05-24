@@ -60,6 +60,16 @@ public class NimeconfirmServiceImpl extends BaseOpenmrsService implements INimec
 	}
 	
 	@Override
+	public List<NimeconfirmEnrolment> getNimeconfirmEnrolmentsToSend(NimeconfirmEnrolment enrolment) {
+		return nimeconfirmDao.getNimeconfirmEnrolmentsToSend(enrolment);
+	}
+	
+	@Override
+	public NimeconfirmEnrolment getNimeconfirmEnrolmentByStatus(String status) {
+		return nimeconfirmDao.getNimeconfirmEnrolmentByStatus(status);
+	}
+	
+	@Override
 	public void voidNimeconfirmEnrolment(int id) {
 		nimeconfirmDao.voidNimeconfirmEnrolment(id);
 	}
