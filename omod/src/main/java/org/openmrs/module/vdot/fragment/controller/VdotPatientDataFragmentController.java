@@ -70,6 +70,8 @@ public class VdotPatientDataFragmentController {
 				jsonNode = (ObjectNode) mapper.readTree(payloadString);
 				if (jsonNode != null) {
 					message = vdotDataExchange.processIncomingVdotData(jsonNode);
+					//message = vdotDataExchange.saveNimeConfirmVideoObs(jsonNode);
+					
 				}
 			}
 			catch (IOException e) {
@@ -134,7 +136,7 @@ public class VdotPatientDataFragmentController {
 	        + "  \"timestamp\" : \"2021-05-20 12:01:15\",\n"
 	        + "  \"patientsData\" : [\n"
 	        + "    {\n"
-	        + "      \"cccNo\" : \"13872008237\",\n"
+	        + "      \"cccNo\" : \"1068604655\",\n"
 	        + "      \"mflCode\" : 12345,\n"
 	        + "      \"adherenceScore\" : 84.45,\n"
 	        + "      \"adherenceTime\": \"2021-05-01 19:01:15\",\n"
