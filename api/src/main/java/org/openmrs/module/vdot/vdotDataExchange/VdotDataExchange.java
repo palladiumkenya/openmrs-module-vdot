@@ -41,6 +41,7 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -167,7 +168,6 @@ public class VdotDataExchange {
 		
 		// Consume read data
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
-		NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
 		String message = "";
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
 		
@@ -200,46 +200,51 @@ public class VdotDataExchange {
 			
 			org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
 			JsonNode arrayNode = null;
-
-
-			JSONArray msg = (JSONArray) jsonObject.get("tag2");
-			Iterator<JSONArray> iterator = msg.iterator();
-			while (iterator.hasNext()) {
-				Iterator<String> innerIterator = iterator.next().iterator();
-				while (innerIterator.hasNext()) {
-					String text = innerIterator.next();
-					System.out.println(text);
-				}
-			}
-
-
-
 			
 			try {
-				org.codehaus.jackson.node.ArrayNode patientDataArray = (org.codehaus.jackson.node.ArrayNode) mapper
+				org.codehaus.jackson.node.ArrayNode patientArrayNode = (org.codehaus.jackson.node.ArrayNode) mapper
 				        .readTree(jsonNode.get("patientsData").toString());
 				
-				if (patientDataArray.isArray()) {
-					for (org.codehaus.jackson.JsonNode node : patientDataArray) {
+				if (patientArrayNode.isArray()) {
+					//for (org.codehaus.jackson.JsonNode node : patientArrayNode) {
+					for (int i = 0; i < patientArrayNode.size(); i++) {
 						
-						String cccNo = node.get("cccNo").asText();
+						String cccNo = patientArrayNode.get(i).get("cccNo").asText();
 						// Check to see a patient with similar upn number exists
 						List<Patient> patients = Context.getPatientService().getPatients(null, cccNo,
 						    allPatientIdentifierTypes, true);
 						if (patients.size() > 0) {
 							Patient patient = patients.get(0);
+							Map<String, List<String>> groupedVideoTimeStamps = null;
+							try {
+								
+								groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i)
+								        .get("videosTimestamps").toString());
+								if (groupedVideoTimeStamps != null) {
+									for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
+										NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
+										Date date = new Date();
+										
+										if (patient != null) {
+											videoObs.setTimeStamp(entry.getValue().toString());
+											videoObs.setPatient(patient);
+											videoObs.setId(patient.getId());
+											videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
+											videoObs.setPatientStatus(patientArrayNode.get(i).get("patientStatus").asText());
+											videoObs.setDate(date); // should be changed to the correct date
+											iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+											message = "Incoming vdot data processed successfully";
+											
+										}
+									}
+									
+								}
+								
+							}
+							catch (ParseException e) {
+								e.printStackTrace();
+							}
 							
-							Double score = node.get("adherenceScore").asDouble();
-							String patientStatus = node.get("patientStatus").asText();
-							String timeStamp = node.get("videosTimestamps").asText();
-							
-							videoObs.setPatient(patient);
-							videoObs.setId(patient.getId());
-							videoObs.setScore(score);
-							videoObs.setPatientStatus(patientStatus);
-							videoObs.setTimeStamp(timeStamp);
-							iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
-							message = "Successfully updated Vdot video obs";
 						} else {
 							message = "The ccc number for patient doesnt exist";
 							
