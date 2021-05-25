@@ -147,7 +147,7 @@
         </createTable>
         <addForeignKeyConstraint baseTableName="kenyaemr_vdot_nimeconfirm_video_obs"
                                  baseColumnNames="patient_id"
-                                 constraintName="kenyaemr_patient" referencedTableName="patient"
+                                 constraintName="patient_for_video_obs" referencedTableName="patient"
                                  referencedColumnNames="patient_id"/>
     </changeSet>
 
