@@ -16,7 +16,7 @@
 }
 .boxStyle {
     color: black;
-    font-size: 1.5em;
+    font-size: 1.2em;
     line-height: 1.5;
     border: 2px darkslategray solid;
     border-radius: 10px;
@@ -40,11 +40,11 @@
 
         <br/>
         <% if (pendingEnrollments > 0) { %>
-        <span id="msgBox"></span>
+        <span id="msgBox" style="color: green"></span><br/>
         <button id="postMessagetoNimeConfirm">Push to server</button>
 
         <% } else { %>
-        <span >No new enrollment(s) to push to nimeConfirm</span>
+        <span style="font-size: medium">No new enrollment to push to nimeConfirm</span>
 
 
             <% } %>
