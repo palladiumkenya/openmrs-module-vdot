@@ -23,13 +23,16 @@ public class VdotEnrollmentStatsFragmentController {
 		Context.addProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		
 		String pendingEnrollment = "select count(*) from kenyaemr_vdot_nimeconfirm_enrolment where status='Pending';";
+		String enrollmentError = "select count(*) from kenyaemr_vdot_nimeconfirm_enrolment where status='Error';";
 		String allProcessedEnrollment = "select count(*) from kenyaemr_vdot_nimeconfirm_enrolment where status='Processed';";
 		Long totalProcessedEnrollment = (Long) Context.getAdministrationService().executeSQL(allProcessedEnrollment, true)
 		        .get(0).get(0);
 		Long pendingEnrols = (Long) Context.getAdministrationService().executeSQL(pendingEnrollment, true).get(0).get(0);
+		Long error = (Long) Context.getAdministrationService().executeSQL(enrollmentError, true).get(0).get(0);
 		
 		model.put("totalProcessed", totalProcessedEnrollment.intValue());
 		model.put("pendingEnrollments", pendingEnrols.intValue());
+		model.put("error", error.intValue());
 		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
 		
 	}
