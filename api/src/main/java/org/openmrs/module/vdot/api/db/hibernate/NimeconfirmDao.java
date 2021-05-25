@@ -17,7 +17,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
-import org.openmrs.module.vdot.api.dao.INimeconfirmDao;
+import org.openmrs.module.vdot.api.db.INimeconfirmDao;
 
 import java.util.Date;
 import java.util.List;

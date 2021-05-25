@@ -19,8 +19,8 @@ import java.io.IOException;
  * The main controller.
  */
 @Controller
-@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/edata")
-public class MobileApplicationRestController extends BaseRestController {
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/vdata")
+public class VdotApplicationRestController extends BaseRestController {
 	
 	protected final Log log = LogFactory.getLog(getClass());
 	
