@@ -162,17 +162,17 @@ public class VdotDataExchange {
 		
 		// Consume read data
 		ConceptService cs = Context.getConceptService();
-
+		
 		EncounterService encounterService = Context.getEncounterService();
-
+		
 		Form vdotDiscontinuationForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION);
 		Form baselineQuestionnaireForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_BASELINE);
 		Location location = Utils.getDefaultLocation();
 		EncounterType baselineEncounter = encounterService
-				.getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_BASELINE_ENCOUNTER);
-
+		        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_BASELINE_ENCOUNTER);
+		
 		EncounterType discEncounter = encounterService
-				.getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION);
+		        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION);
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		String message = "";
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -250,30 +250,31 @@ public class VdotDataExchange {
 							catch (ParseException e) {
 								e.printStackTrace();
 							}
-
+							
 							Map discontinueData = (Map) patientArrayNode.get(i).get("discontinueData");
-
+							
 							if (!discontinueData.isEmpty()) {
 								Obs o = new Obs();
 								Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
 								while (mapItr.hasNext()) {
 									Map.Entry pair = mapItr.next();
-									o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(discontinueData.get(pair.getKey()).toString())));
+									o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(discontinueData
+									        .get(pair.getKey()).toString())));
 									o.setDateCreated(new Date());
 									o.setCreator(Context.getAuthenticatedUser());
 									o.setObsDatetime(new Date());
 									o.setPerson(patient);
-									o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(discontinueData.get(pair.getValue())
-											.toString())));
+									o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(discontinueData.get(
+									    pair.getValue()).toString())));
 									o.setValueNumeric((Double) (discontinueData.get(pair.getValue())));
 									o.setValueDatetime((Date) (discontinueData.get(pair.getValue())));
 									o.setValueBoolean((Boolean) (discontinueData.get(pair.getValue())));
-
+									
 									Encounter encounter = new Encounter();
 									encounter.setPatient(patient);
 									encounter.setLocation(location);
 									encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context
-											.getProviderService().getProvider(1));
+									        .getProviderService().getProvider(1));
 									encounter.setEncounterType(discEncounter);
 									encounter.setEncounterDatetime(new Date());
 									encounter.setDateCreated(new Date());
@@ -282,20 +283,21 @@ public class VdotDataExchange {
 									Context.getEncounterService().saveEncounter(encounter);
 								}
 							}
-
+							
 							Map baselineQuestionnaire = (Map) patientArrayNode.get(i).get("baselineQuestionnaire");
 							if (!baselineQuestionnaire.isEmpty()) {
 								Obs o = new Obs();
 								Iterator<Map.Entry> mapItr = baselineQuestionnaire.entrySet().iterator();
 								while (mapItr.hasNext()) {
 									Map.Entry pair = mapItr.next();
-									o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(baselineQuestionnaire.get(pair.getKey()).toString())));
+									o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(baselineQuestionnaire.get(
+									    pair.getKey()).toString())));
 									o.setDateCreated(new Date());
 									o.setCreator(Context.getAuthenticatedUser());
 									o.setObsDatetime(new Date());
 									o.setPerson(patient);
-									o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(baselineQuestionnaire.get(pair.getValue())
-											.toString())));
+									o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(baselineQuestionnaire.get(
+									    pair.getValue()).toString())));
 									o.setValueNumeric((Double) (baselineQuestionnaire.get(pair.getValue())));
 									o.setValueDatetime((Date) (baselineQuestionnaire.get(pair.getValue())));
 									o.setValueBoolean((Boolean) (baselineQuestionnaire.get(pair.getValue())));
@@ -303,7 +305,7 @@ public class VdotDataExchange {
 									encounter.setPatient(patient);
 									encounter.setLocation(location);
 									encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context
-											.getProviderService().getProvider(1));
+									        .getProviderService().getProvider(1));
 									encounter.setEncounterType(baselineEncounter);
 									encounter.setEncounterDatetime(new Date());
 									encounter.setDateCreated(new Date());
@@ -312,13 +314,12 @@ public class VdotDataExchange {
 									Context.getEncounterService().saveEncounter(encounter);
 								}
 							}
-
+							
 						} else {
 							message = "The ccc number for patient doesnt exist";
 							
 						}
-
-
+						
 					}
 				}
 				

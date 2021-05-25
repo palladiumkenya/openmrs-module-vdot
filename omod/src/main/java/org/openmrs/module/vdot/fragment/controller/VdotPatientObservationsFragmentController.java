@@ -119,8 +119,7 @@ public class VdotPatientObservationsFragmentController {
 								//verify the valid error code first
 								int statusCode = response.getStatusLine().getStatusCode();
 								if (statusCode == 429) { // too many requests. just terminate
-									System.out
-									        .println("Many requests please terminate");
+									System.out.println("Many requests please terminate");
 									log.warn("Many requests please terminate");
 									return;
 								}

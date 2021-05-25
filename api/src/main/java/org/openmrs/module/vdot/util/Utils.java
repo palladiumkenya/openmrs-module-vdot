@@ -220,7 +220,7 @@ public class Utils {
 		}
 		return groupedTimeStamps;
 	}
-
+	
 	public static Integer conceptNameToIdMapper(String name) {
 		HashMap<String, Integer> conceptMap = new HashMap();
 		conceptMap.put("dateDiscontinued", 164384);
@@ -249,7 +249,7 @@ public class Utils {
 			return null;
 		}
 	}
-
+	
 	public static Integer ansConceptNameToIdMapper(String name) {
 		HashMap<String, Integer> conceptMap = new HashMap();
 		conceptMap.put("Transferred Out", 159492);
@@ -299,5 +299,5 @@ public class Utils {
 			return null;
 		}
 	}
-
+	
 }
