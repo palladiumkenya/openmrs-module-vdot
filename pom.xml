@@ -48,7 +48,7 @@
 		<jacksonVersion>2.10.1</jacksonVersion>
 		<jsonPathVersion>0.8.1</jsonPathVersion>
 		<apacheHttpClientVersion>4.5.10</apacheHttpClientVersion>
-		<webservices.restVersion>2.11</webservices.restVersion>
+		<webservicesRestVersion>2.1</webservicesRestVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 
