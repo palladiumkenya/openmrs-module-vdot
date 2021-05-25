@@ -1,4 +1,4 @@
-package org.openmrs.module.vdot.api.dao;
+package org.openmrs.module.vdot.api.db;
 
 import org.openmrs.Patient;
 import org.openmrs.module.vdot.api.NimeconfirmEnrolment;

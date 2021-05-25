@@ -189,7 +189,7 @@ public class VdotDataExchange {
 		
 		try {
 			jsonNode = (org.codehaus.jackson.node.ObjectNode) mapper.readTree(resultPayload);
-
+			
 			String ft = globalPropertyObject.getValue().toString();
 			fetchDate = formatter.parse(ft);
 		}
@@ -207,7 +207,7 @@ public class VdotDataExchange {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
 		if (fetchDate.after(timestampDate)) {
 			
 			//	org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
