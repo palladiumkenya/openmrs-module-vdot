@@ -69,7 +69,7 @@ public class VdotPatientDataFragmentController {
 			try {
 				jsonNode = (ObjectNode) mapper.readTree(payloadString);
 				if (jsonNode != null) {
-					message = vdotDataExchange.processIncomingVdotData(jsonNode);
+					//message = vdotDataExchange.processIncomingVdotData(jsonNode);
 					//message = vdotDataExchange.saveNimeConfirmVideoObs(jsonNode);
 					
 				}

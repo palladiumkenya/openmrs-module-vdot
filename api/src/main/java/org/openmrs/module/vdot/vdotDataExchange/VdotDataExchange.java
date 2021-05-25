@@ -158,7 +158,9 @@ public class VdotDataExchange {
 	 * 
 	 * @return
 	 */
-	public String processIncomingVdotData(org.codehaus.jackson.JsonNode jsonNode) {
+	public String processIncomingVdotData(String resultPayload) {
+		org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
+		org.codehaus.jackson.node.ObjectNode jsonNode = null;
 		
 		// Consume read data
 		ConceptService cs = Context.getConceptService();
@@ -186,6 +188,8 @@ public class VdotDataExchange {
 		    "vdotVideoMessages.lastFetchDateAndTime");
 		
 		try {
+			jsonNode = (org.codehaus.jackson.node.ObjectNode) mapper.readTree(resultPayload);
+
 			String ft = globalPropertyObject.getValue().toString();
 			fetchDate = formatter.parse(ft);
 		}
@@ -195,131 +199,135 @@ public class VdotDataExchange {
 		
 		// Get timestamp to compare with last run timestamp
 		try {
-			String timeStamp = jsonNode.get("timestamp").asText();
-			timestampDate = formatter.parse(timeStamp);
+			if (jsonNode != null) {
+				String timeStamp = jsonNode.get("timestamp").asText();
+				timestampDate = formatter.parse(timeStamp);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		if (fetchDate.after(timestampDate)) {
 			
-			org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
+			//	org.codehaus.jackson.map.ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
 			JsonNode arrayNode = null;
 			
 			try {
-				org.codehaus.jackson.node.ArrayNode patientArrayNode = (org.codehaus.jackson.node.ArrayNode) mapper
-				        .readTree(jsonNode.get("patientsData").toString());
-				
-				if (patientArrayNode.isArray()) {
-					//for (org.codehaus.jackson.JsonNode node : patientArrayNode) {
-					for (int i = 0; i < patientArrayNode.size(); i++) {
-						
-						String cccNo = patientArrayNode.get(i).get("cccNo").asText();
-						// Check to see a patient with similar upn number exists
-						List<Patient> patients = Context.getPatientService().getPatients(null, cccNo,
-						    allPatientIdentifierTypes, true);
-						if (patients.size() > 0) {
-							Patient patient = patients.get(0);
-							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");
-							Map<String, List<String>> groupedVideoTimeStamps = null;
-							try {
-								
-								groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i)
-								        .get("videosTimestamps").toString());
-								if (groupedVideoTimeStamps != null) {
-									for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
-										NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
-										List<String> vTimestamps = (List<String>) entry.getValue();
-										if (patient != null && vTimestamps.size() > 0) {
-											
-											videoObs.setTimeStamp(StringUtils.join(vTimestamps, ","));
-											videoObs.setPatient(patient);
-											videoObs.setId(patient.getId());
-											videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
-											videoObs.setPatientStatus(patientArrayNode.get(i).get("patientStatus").asText());
-											videoObs.setDate(vformatter.parse(entry.getKey().toString()));
-											iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
-											message = "Incoming vdot data processed successfully";
+				if (jsonNode != null) {
+					org.codehaus.jackson.node.ArrayNode patientArrayNode = (org.codehaus.jackson.node.ArrayNode) jsonNode
+					        .get("patientsData");
+					
+					if (patientArrayNode.isArray()) {
+						for (int i = 0; i < patientArrayNode.size(); i++) {
+							
+							String cccNo = patientArrayNode.get(i).get("cccNo").asText();
+							// Check to see a patient with similar upn number exists
+							List<Patient> patients = Context.getPatientService().getPatients(null, cccNo,
+							    allPatientIdentifierTypes, true);
+							if (patients.size() > 0) {
+								Patient patient = patients.get(0);
+								SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");
+								Map<String, List<String>> groupedVideoTimeStamps = null;
+								try {
+									
+									groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i)
+									        .get("videosTimestamps").toString());
+									if (groupedVideoTimeStamps != null) {
+										for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
+											NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
+											List<String> vTimestamps = (List<String>) entry.getValue();
+											if (patient != null && vTimestamps.size() > 0) {
+												
+												videoObs.setTimeStamp(StringUtils.join(vTimestamps, ","));
+												videoObs.setPatient(patient);
+												videoObs.setId(patient.getId());
+												videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
+												videoObs.setPatientStatus(patientArrayNode.get(i).get("patientStatus")
+												        .asText());
+												videoObs.setDate(vformatter.parse(entry.getKey().toString()));
+												iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+												message = "Incoming vdot data processed successfully";
+											}
 										}
+										
 									}
 									
 								}
+								catch (ParseException e) {
+									e.printStackTrace();
+								}
+								
+								Map discontinueData = (Map) patientArrayNode.get(i).get("discontinueData");
+								
+								if (!discontinueData.isEmpty()) {
+									Obs o = new Obs();
+									Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
+									while (mapItr.hasNext()) {
+										Map.Entry pair = mapItr.next();
+										o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(discontinueData.get(
+										    pair.getKey()).toString())));
+										o.setDateCreated(new Date());
+										o.setCreator(Context.getAuthenticatedUser());
+										o.setObsDatetime(new Date());
+										o.setPerson(patient);
+										o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(discontinueData.get(
+										    pair.getValue()).toString())));
+										o.setValueNumeric((Double) (discontinueData.get(pair.getValue())));
+										o.setValueDatetime((Date) (discontinueData.get(pair.getValue())));
+										o.setValueBoolean((Boolean) (discontinueData.get(pair.getValue())));
+										
+										Encounter encounter = new Encounter();
+										encounter.setPatient(patient);
+										encounter.setLocation(location);
+										encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context
+										        .getProviderService().getProvider(1));
+										encounter.setEncounterType(discEncounter);
+										encounter.setEncounterDatetime(new Date());
+										encounter.setDateCreated(new Date());
+										encounter.setForm(vdotDiscontinuationForm);
+										encounter.addObs(o);
+										Context.getEncounterService().saveEncounter(encounter);
+									}
+								}
+								
+								Map baselineQuestionnaire = (Map) patientArrayNode.get(i).get("baselineQuestionnaire");
+								if (!baselineQuestionnaire.isEmpty()) {
+									Obs o = new Obs();
+									Iterator<Map.Entry> mapItr = baselineQuestionnaire.entrySet().iterator();
+									while (mapItr.hasNext()) {
+										Map.Entry pair = mapItr.next();
+										o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(baselineQuestionnaire.get(
+										    pair.getKey()).toString())));
+										o.setDateCreated(new Date());
+										o.setCreator(Context.getAuthenticatedUser());
+										o.setObsDatetime(new Date());
+										o.setPerson(patient);
+										o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(baselineQuestionnaire
+										        .get(pair.getValue()).toString())));
+										o.setValueNumeric((Double) (baselineQuestionnaire.get(pair.getValue())));
+										o.setValueDatetime((Date) (baselineQuestionnaire.get(pair.getValue())));
+										o.setValueBoolean((Boolean) (baselineQuestionnaire.get(pair.getValue())));
+										Encounter encounter = new Encounter();
+										encounter.setPatient(patient);
+										encounter.setLocation(location);
+										encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context
+										        .getProviderService().getProvider(1));
+										encounter.setEncounterType(baselineEncounter);
+										encounter.setEncounterDatetime(new Date());
+										encounter.setDateCreated(new Date());
+										encounter.setForm(baselineQuestionnaireForm);
+										encounter.addObs(o);
+										Context.getEncounterService().saveEncounter(encounter);
+									}
+								}
+								
+							} else {
+								message = "The ccc number for patient doesnt exist";
 								
 							}
-							catch (ParseException e) {
-								e.printStackTrace();
-							}
-							
-							Map discontinueData = (Map) patientArrayNode.get(i).get("discontinueData");
-							
-							if (!discontinueData.isEmpty()) {
-								Obs o = new Obs();
-								Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
-								while (mapItr.hasNext()) {
-									Map.Entry pair = mapItr.next();
-									o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(discontinueData
-									        .get(pair.getKey()).toString())));
-									o.setDateCreated(new Date());
-									o.setCreator(Context.getAuthenticatedUser());
-									o.setObsDatetime(new Date());
-									o.setPerson(patient);
-									o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(discontinueData.get(
-									    pair.getValue()).toString())));
-									o.setValueNumeric((Double) (discontinueData.get(pair.getValue())));
-									o.setValueDatetime((Date) (discontinueData.get(pair.getValue())));
-									o.setValueBoolean((Boolean) (discontinueData.get(pair.getValue())));
-									
-									Encounter encounter = new Encounter();
-									encounter.setPatient(patient);
-									encounter.setLocation(location);
-									encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context
-									        .getProviderService().getProvider(1));
-									encounter.setEncounterType(discEncounter);
-									encounter.setEncounterDatetime(new Date());
-									encounter.setDateCreated(new Date());
-									encounter.setForm(vdotDiscontinuationForm);
-									encounter.addObs(o);
-									Context.getEncounterService().saveEncounter(encounter);
-								}
-							}
-							
-							Map baselineQuestionnaire = (Map) patientArrayNode.get(i).get("baselineQuestionnaire");
-							if (!baselineQuestionnaire.isEmpty()) {
-								Obs o = new Obs();
-								Iterator<Map.Entry> mapItr = baselineQuestionnaire.entrySet().iterator();
-								while (mapItr.hasNext()) {
-									Map.Entry pair = mapItr.next();
-									o.setConcept(cs.getConcept(Utils.conceptNameToIdMapper(baselineQuestionnaire.get(
-									    pair.getKey()).toString())));
-									o.setDateCreated(new Date());
-									o.setCreator(Context.getAuthenticatedUser());
-									o.setObsDatetime(new Date());
-									o.setPerson(patient);
-									o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(baselineQuestionnaire.get(
-									    pair.getValue()).toString())));
-									o.setValueNumeric((Double) (baselineQuestionnaire.get(pair.getValue())));
-									o.setValueDatetime((Date) (baselineQuestionnaire.get(pair.getValue())));
-									o.setValueBoolean((Boolean) (baselineQuestionnaire.get(pair.getValue())));
-									Encounter encounter = new Encounter();
-									encounter.setPatient(patient);
-									encounter.setLocation(location);
-									encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context
-									        .getProviderService().getProvider(1));
-									encounter.setEncounterType(baselineEncounter);
-									encounter.setEncounterDatetime(new Date());
-									encounter.setDateCreated(new Date());
-									encounter.setForm(baselineQuestionnaireForm);
-									encounter.addObs(o);
-									Context.getEncounterService().saveEncounter(encounter);
-								}
-							}
-							
-						} else {
-							message = "The ccc number for patient doesnt exist";
 							
 						}
-						
 					}
 				}
 				
