@@ -42,8 +42,8 @@ public class VdotApplicationRestController extends BaseRestController {
 		}
 		
 		if (requestBody != null) {
-			VdotDataExchange shr = new VdotDataExchange();
-			return shr.processIncomingVdotData(requestBody);
+			VdotDataExchange vdotDataExchange = new VdotDataExchange();
+			return vdotDataExchange.processVideoObs(requestBody);
 			
 		}
 		return new SimpleObject().add("Report", "The request could not be interpreted properly");
