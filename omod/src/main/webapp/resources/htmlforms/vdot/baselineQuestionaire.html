@@ -14,8 +14,7 @@
 <htmlform>
 
     <script type="text/javascript">
-        var GREENCARD_VELOCITY = "<lookup expression="
-        kenyaemr.GreenCardVelocityCalculation()
+        var GREENCARD_VELOCITY = "<lookup expression="kenyaemr.GreenCardVelocityCalculation()" />";
         " />";
         var PATIENT_ON_ART = GREENCARD_VELOCITY.split(",")[2].split(":")[1];
         var REGIMEN_NAME = GREENCARD_VELOCITY.split(",")[4].split(":")[1];
@@ -23,10 +22,10 @@
         jq(document).ready(function(){
 
             if(PATIENT_ON_ART =="true") {
-                jq('#current-regimen').html(REGIMEN_NAME);
+                jq('#current-regimen:text').val(REGIMEN_NAME);
 
             }else {
-                jq('#current-regimen').html("None");
+                jq('#current-regimen:text').val("None");
             }
          jq("#drug-frequency-obs").change(function(){
             if (getValue('drug-frequency-obs.value') ==160864 ) {
@@ -101,7 +100,7 @@
                 </tr>
 
                 <tr>
-                    <td id="drugs-frequency"/>
+                    <td id="drugs-frequency">
                     How often do you take drugs?</td>
                     <td>
                         <obs id="drug-frequency-obs" conceptId="160855AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -114,8 +113,8 @@
                 <tr id="drug-time">
 
                     <td id="morning-dose">Time for morning dose</td>
+                    <td>
                     <obs conceptId="161015AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
-
                     </td>
                     <td id="evening-dose">Time for evening dose</td>
                     <td>
@@ -139,6 +138,7 @@
                              style="checkbox"/>
 
                     </td>
+                </tr>
                 <tr>
                     <td id="care-giver">Who is the primary care giver?</td>
                     <td>
@@ -230,7 +230,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td id="current-sch-level">Level of schooling the child is at?</td>
+                    <td id="current-sch-level">Level of schooling the child is at? </td>
                     <td>
                         <obs conceptId="1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
                              answerConceptIds="160289AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1713AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1714AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
