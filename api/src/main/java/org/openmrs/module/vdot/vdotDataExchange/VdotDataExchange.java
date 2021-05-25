@@ -238,7 +238,6 @@ public class VdotDataExchange {
 											NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
 											List<String> vTimestamps = (List<String>) entry.getValue();
 											if (patient != null && vTimestamps.size() > 0) {
-												
 												videoObs.setTimeStamp(StringUtils.join(vTimestamps, ","));
 												videoObs.setPatient(patient);
 												videoObs.setId(patient.getId());
@@ -259,7 +258,6 @@ public class VdotDataExchange {
 								}
 								
 								Map discontinueData = (Map) patientArrayNode.get(i).get("discontinueData");
-								
 								if (!discontinueData.isEmpty()) {
 									Obs o = new Obs();
 									Iterator<Map.Entry> mapItr = discontinueData.entrySet().iterator();
@@ -414,50 +412,61 @@ public class VdotDataExchange {
 		return countyCode;
 	}
 	
-	public String saveNimeConfirmVideoObs(ObjectNode payload) {
+	public String processVideoObs(String payload) {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode jsonNode = null;
 		String message = "";
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		
-		ArrayNode patientArrayNode = (ArrayNode) payload.get("patientsData");
-		if (patientArrayNode.size() > 0) {
-			for (int i = 0; i < patientArrayNode.size(); i++) {
-				String ccc = patientArrayNode.get(i).get("cccNo").textValue();
-				Patient patient = Context.getPatientService().identifierInUse(ccc,
-				    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
-				Map<String, List<String>> groupedVideoTimeStamps = null;
-				try {
-					
-					groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i).get("videosTimestamps")
-					        .toString());
-					if (groupedVideoTimeStamps != null) {
-						for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
-							NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
-							Date date = new Date();
+		try {
+			jsonNode = mapper.readTree(payload);
+			if (jsonNode != null) {
+				ArrayNode patientArrayNode = (ArrayNode) jsonNode.get("patientsData");
+				if (patientArrayNode.size() > 0) {
+					for (int i = 0; i < patientArrayNode.size(); i++) {
+						String ccc = patientArrayNode.get(i).get("cccNo").asText();
+						Patient patient = Context.getPatientService().identifierInUse(ccc,
+						    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
+						Map<String, List<String>> groupedVideoTimeStamps = null;
+						try {
+							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");
 							
-							if (patient != null) {
-								videoObs.setTimeStamp(entry.getValue().toString());
-								videoObs.setPatient(patient);
-								videoObs.setPatientStatus("test");
-								videoObs.setDate(date); // should be changed to the correct date
-								iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
-								message = "Incoming vdot data processed successfully";
+							groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i)
+							        .get("videosTimestamps").toString());
+							if (groupedVideoTimeStamps != null) {
+								for (Map.Entry entry : groupedVideoTimeStamps.entrySet()) {
+									List<String> vTimestamps = (List<String>) entry.getValue();
+									NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
+									
+									if (patient != null && vTimestamps.size() > 0) {
+										videoObs.setTimeStamp(StringUtils.join(vTimestamps, ","));
+										videoObs.setPatient(patient);
+										videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
+										videoObs.setPatientStatus(patientArrayNode.get(i).get("patientStatus").asText());
+										videoObs.setDate(vformatter.parse(entry.getKey().toString()));
+										iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
+										message = "Incoming vdot data processed successfully";
+										
+									}
+								}
 								
 							}
+							
+						}
+						catch (ParseException e) {
+							e.printStackTrace();
+						}
+						catch (JsonProcessingException e) {
+							e.printStackTrace();
 						}
 						
 					}
-					
 				}
-				catch (ParseException e) {
-					e.printStackTrace();
-				}
-				catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-				
 			}
 		}
-		
+		catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 		return message;
 		
 	}
