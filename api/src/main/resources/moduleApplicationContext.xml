@@ -75,7 +75,7 @@
         <property name="defaultCompletionForm" ref="vdot.form.vdotClientDiscontinuation" />
         <property name="patientForms">
             <set>
-                <ref bean="vdot.form.vdotClientEnrollment" />
+                  <ref bean="vdot.form.baselineQuestionaire" />
             </set>
         </property>
         <property name="fragments">
@@ -86,15 +86,6 @@
             </map>
         </property>
         <property name="order" value="820" />
-    </bean>
-
-    <!-- Forms config -->
-    <bean id="vdot.config.form" class="org.openmrs.module.kenyacore.form.FormConfiguration">
-        <property name="commonPatientForms">
-            <set>
-                <ref bean="vdot.form.baselineQuestionaire" />
-             </set>
-        </property>
     </bean>
 
     <!-- Vdot enrollment form -->
@@ -126,6 +117,7 @@
         <property name="icon" value="kenyaui:forms/completion.png" />
         <property name="htmlform" value="vdot:vdot/vdotClientDiscontinuation.html" />
     </bean>
+
     <bean id="vdot.form.baselineQuestionaire" class="org.openmrs.module.kenyacore.form.FormDescriptor">
         <property name="targetUuid" value="fc2d5727-8392-4a49-b254-6c7d3138e81d" />
         <property name="apps">
@@ -134,7 +126,7 @@
                 <ref bean="kenyaemr.app.chart" />
             </set>
         </property>
-        <property name="icon" value="kenyaui:forms/family_history.png" />
+        <property name="icon" value="kenyaui:forms/generic.png" />
         <property name="htmlform" value="vdot:vdot/baselineQuestionaire.html" />
     </bean>
 
