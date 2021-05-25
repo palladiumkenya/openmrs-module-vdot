@@ -101,6 +101,7 @@
 <script type="text/javascript">
     jQuery(function () {
 
+        patientO = JSON.stringify(${ pillCalendar });
         var cal = CALENDAR();
         cal.init();
     });
