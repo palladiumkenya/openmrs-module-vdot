@@ -29,7 +29,7 @@
     <fieldset>
         <legend>nimeConfirm Enrollment statistics</legend>
         <div>
-            <table class="simple-table" width="100%">
+            <table class="simple-table" width="95%">
                 <thead>
                 <th width="50%">Enrollments</th>
                 <th width="40%">Total</th>
@@ -43,6 +43,11 @@
                     <td>Pending enrollments</td>
                     <td>${pendingEnrollments}</td>
                 </tr>
+                <tr>
+                    <td>Error</td>
+                    <td>${error}</td>
+                </tr>
+
                 </tbody>
             </table>
         </div>

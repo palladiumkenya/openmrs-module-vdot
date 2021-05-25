@@ -10,7 +10,10 @@
 .mainBox {
     float: left;
 }
+.msg {
+    width: 90%
 
+}
 .boxStyle {
     color: black;
     font-size: 1.5em;
@@ -21,6 +24,7 @@
     margin: 5px 2px;
     width: 48%;
 }
+
 </style>
 
 <div class="ke-page-sidebar">
@@ -31,14 +35,14 @@
 </div>
 
 <div class="ke-page-content">
-    <div class="mainBox boxStyle">
+    <div class="mainBox boxStyle" style="width: 90%">
         ${ ui.includeFragment("vdot", "vdotEnrollmentStats") }
 
         <br/>
-        <br/>
         <% if (pendingEnrollments > 0) { %>
-        <button id="postMessagetoNimeConfirm">Push Enrollment(s) to nimeConfirm</button>
         <span id="msgBox"></span>
+        <button id="postMessagetoNimeConfirm">Push to server</button>
+
         <% } else { %>
         <span >No new enrollment(s) to push to nimeConfirm</span>
 
@@ -46,7 +50,7 @@
             <% } %>
 
     </div>
-    <div class="mainBox boxStyle">
+    <div class="mainBox boxStyle" style="margin-top: 50px; width: 90%">
         Something here for pulling data
 
 
@@ -75,5 +79,18 @@
                 })
         });
 
+    });
+
+    jq(function() {
+        jq('#postMessagetoNimeConfirm').click(function() {
+            jq.getJSON('${ ui.actionLink("vdot", "vdotPatientObservations", "postEnrollmentMessage") }',
+                {})
+                .success(function(data) {
+                    jq('#msgBox').html("Successfully posted to nimeConfirm");
+                })
+                .error(function(xhr, status, err) {
+                    jq('#msgBox').html("Could not post to nimeConfirm. Kindly contact an admin user for help");
+                })
+        });
     });
 </script>

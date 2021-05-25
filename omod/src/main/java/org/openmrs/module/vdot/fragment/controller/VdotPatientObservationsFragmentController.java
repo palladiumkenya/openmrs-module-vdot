@@ -129,6 +129,8 @@ public class VdotPatientObservationsFragmentController {
 									nimeconfirmService.saveNimeconfirmEnrolment(enrolment);
 									log.info("Successfully pushed enrollment info with id " + enrolment.getId());
 								} else if (statusCode == 412) {
+									enrolment.setStatus("Error");
+									nimeconfirmService.saveNimeconfirmEnrolment(enrolment);
 									
 									JSONParser parser = new JSONParser();
 									JSONObject responseObj = (JSONObject) parser.parse(EntityUtils.toString(response
