@@ -1,68 +1,125 @@
 <%
-	ui.decorateWith("kenyaui", "panel", [ heading: "NimeCONFIRM adherence trend" ])
-
+	ui.decorateWith("kenyaui", "panel", [ heading: "" ])
+	ui.includeJavascript("kenyaemr", "highcharts.js")
+	ui.includeJavascript("kenyaemr", "highcharts-grouped-categories.js")
 %>
 <style>
-.simple-table {
-	border: solid 1px #DDEEEE;
+.highcharts-figure, .highcharts-data-table table {
+	min-width: 360px;
+	max-width: 800px;
+	margin: 1em auto;
+}
+
+.highcharts-data-table table {
+	font-family: Verdana, sans-serif;
 	border-collapse: collapse;
-	border-spacing: 0;
-	font: normal 15px Arial, sans-serif;
+	border: 1px solid #EBEBEB;
+	margin: 10px auto;
+	text-align: center;
+	width: 100%;
+	max-width: 500px;
 }
-.simple-table thead th {
-	background-color: #DDEFEF;
-	border: solid 1px #DDEEEE;
-	color: #336B6B;
-	padding: 10px;
-	text-align: left;
-	text-shadow: 1px 1px 1px #fff;
+.highcharts-data-table caption {
+	padding: 1em 0;
+	font-size: 1.2em;
+	color: #555;
 }
-.simple-table td {
-	border: solid 1px #DDEEEE;
-	color: #333;
-	padding: 5px;
-	text-shadow: 1px 1px 1px #fff;
+.highcharts-data-table th {
+	font-weight: 600;
+	padding: 0.5em;
 }
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+	padding: 0.5em;
+}
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+	background: #f8f8f8;
+}
+.highcharts-data-table tr:hover {
+	background: #f1f7ff;
+}
+
 </style>
 
 <div>
 
 	<fieldset>
-		<legend>NimeCONFIRM observations</legend>
+		<legend></legend>
 
-		<table class="simple-table">
+		<table width="98%">
 			<tr>
-				<th align="left" width="15%">Date</th>
-				<th align="left" width="15%">Adherence score (%)</th>
-				<th align="left" width="15%">Status</th>
-				<th align="left" width="15%">Video timestamps</th>
-			</tr>
-			<tr>
-				<td>12-May-2021</td>
-				<td>90</td>
-				<td>Active</td>
-				<td>Morning,Midday,Evening </td>
-			</tr>
-			<tr>
-				<td>11-May-2021</td>
-				<td>80</td>
-				<td>Active</td>
-				<td>Morning,Midday,Evening </td>
-			</tr>
-			<tr>
-				<td>10-May-2021</td>
-				<td>70</td>
-				<td>Active</td>
-				<td>Morning,Midday,Evening </td>
-			</tr>
-			<tr>
-				<td>09-May-2021</td>
-				<td>90</td>
-				<td>Active</td>
-				<td>Morning,Midday,Evening </td>
+				<td colspan="4">
+					<div id="adherence_score_chart" style="min-width: 450px; height: 300px; margin: 0 auto"></div>
+				</td>
 			</tr>
 		</table>
 
 	</fieldset>
 
 </div>
+<script>
+    jQuery(function () {
+        jQuery('#adherence_score_chart').highcharts({
+            chart: {
+                type: 'line'
+            },
+            rangeSelector: {
+                allButtonsEnabled: true
+            },
+            title: {
+                text: 'Adherence score'
+            },
+            subtitle: {
+                text: 'Source: NimeCONFIRM program'
+            },
+            xAxis: {
+                accessibility: {
+                    rangeDescription: ''
+                },
+				type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Adherence score'
+                }
+
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    },
+                    pointStart: 2010
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.0f}</b><br/>'
+            },
+
+            series: [{
+                name: 'Score',
+                data: ${ vdotTrend }
+            }],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 700
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+        });
+	});
+</script>

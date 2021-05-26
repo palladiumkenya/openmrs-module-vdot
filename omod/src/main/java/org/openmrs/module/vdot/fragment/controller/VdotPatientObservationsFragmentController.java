@@ -14,7 +14,6 @@
 
 package org.openmrs.module.vdot.fragment.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -29,9 +28,11 @@ import org.json.simple.parser.JSONParser;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.INimeconfirmService;
+import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
+import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
+import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,10 +54,25 @@ public class VdotPatientObservationsFragmentController {
 	
 	private String url = "http://www.google.com:80/index.html";
 	
-	public void controller(@RequestParam("patientId") Patient patient, PageModel model) {
-		
+	INimeconfirmService moduleService = Context.getService(INimeconfirmService.class);
+	
+	public void controller(@RequestParam("patientId") Patient patient, PageModel model, UiUtils ui) {
+		List<NimeconfirmVideoObs> videoObs = moduleService.getNimeconfirmVideoObsByPatient(patient);
+		List<List<Long>> vdotTrend = new ArrayList<List<Long>>();
+		if (videoObs != null && !videoObs.isEmpty()) {
+			for (NimeconfirmVideoObs vObs : videoObs) {
+				List<Long> dailyScore = new ArrayList<Long>();
+				dailyScore.add(vObs.getDate().getTime());
+				dailyScore.add(vObs.getScore().longValue());
+				vdotTrend.add(dailyScore);
+			}
+		}
+		model.put("vdotTrend", ui.toJson(vdotTrend));
 	}
 	
+	/**
+	 * Post enrollment message to nimeconfirm server
+	 */
 	public void postEnrollmentMessage() {
 		
 		INimeconfirmService nimeconfirmService = Context.getService(INimeconfirmService.class);

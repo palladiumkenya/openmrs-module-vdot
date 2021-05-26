@@ -12,6 +12,7 @@ package org.openmrs.module.vdot.api.db.hibernate;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Patient;
 import org.openmrs.api.db.DAOException;
@@ -19,6 +20,7 @@ import org.openmrs.module.vdot.api.NimeconfirmEnrolment;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.db.INimeconfirmDao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -105,10 +107,8 @@ public class NimeconfirmDao implements INimeconfirmDao {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmVideoObs.class);
 		criteria.add(Restrictions.eq("patient", patient));
 		criteria.add(Restrictions.eq("voided", false));
-		if (!CollectionUtils.isEmpty(criteria.list())) {
-			return criteria.list();
-		}
-		return null;
+		criteria.addOrder(Order.asc("date"));
+		return criteria.list();
 	}
 	
 	@Override
@@ -116,17 +116,15 @@ public class NimeconfirmDao implements INimeconfirmDao {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmVideoObs.class);
 		criteria.add(Restrictions.eq("patient", patient));
 		criteria.add(Restrictions.eq("voided", false));
-		criteria.add(Restrictions.eq("date", date.after(date)));
-		if (!CollectionUtils.isEmpty(criteria.list())) {
-			return criteria.list();
-		}
-		return null;
+		criteria.addOrder(Order.asc("date"));
+		return criteria.list();
 	}
 	
 	@Override
 	public List<NimeconfirmVideoObs> getNimeconfirmVideoObs() {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(NimeconfirmVideoObs.class);
 		criteria.add(Restrictions.eq("voided", false));
+		criteria.addOrder(Order.asc("date"));
 		//return result
 		return criteria.list();
 	}
