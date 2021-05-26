@@ -67,10 +67,7 @@
     jQuery(function() {
 
         jq('#pullMessagesFromVdot').click(function() {
-            jq.getJSON('${ ui.actionLink("vdot", "vdotPatientData", "getMessagesFromVdot") }',
-                {
-
-                })
+            jq.getJSON('${ ui.actionLink("vdot", "vdotPatientData", "getNimeConfirmVideoObs") }')
                 .success(function(data) {
                     jq('#msgBox').html("Vdot messages processed successfully");
                 })

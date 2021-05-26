@@ -416,7 +416,7 @@ public class VdotDataExchange {
 		return countyCode;
 	}
 	
-	public String processVideoObs(String payload) {
+	public static String processVideoObs(String payload) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode jsonNode = null;
 		String message = "";
