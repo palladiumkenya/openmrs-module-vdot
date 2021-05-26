@@ -446,7 +446,6 @@ public class VdotDataExchange {
 										videoObs.setDate(vformatter.parse(entry.getKey().toString()));
 										iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 										message = "Incoming vdot data processed successfully";
-										
 									}
 								}
 								

@@ -26,5 +26,6 @@ import java.util.List;
 public class VdotPatientProfilePageController {
 	
 	public void controller(@RequestParam("patientId") Patient patient, PageModel model) {
+		
 	}
 }
