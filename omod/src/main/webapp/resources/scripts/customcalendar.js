@@ -1,6 +1,7 @@
 var CALENDAR = function () {
 
-    var patientobject = JSON.parse(patientO);
+    //var patientobject = JSON.parse(patientO);
+    var patientobject = patientO;
 
     var monthSelect = document.getElementById('monthSelect');
     var btnSearch = document.getElementById('btnSearch');

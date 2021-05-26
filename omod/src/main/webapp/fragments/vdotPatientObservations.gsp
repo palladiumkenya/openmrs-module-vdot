@@ -1,5 +1,5 @@
 <%
-	ui.decorateWith("kenyaui", "panel", [ heading: "NimeCONFIRM Observation History" ])
+	ui.decorateWith("kenyaui", "panel", [ heading: "NimeCONFIRM adherence trend" ])
 
 %>
 <style>
