@@ -12,29 +12,7 @@
         See http://www.liquibase.org/manual/home#available_database_refactorings
         for a list of supported elements and attributes
     -->
- 
- 	<!-- Uncomment the changeset below if you want to make the Item class persistable, see also Item and VdotDaoTest -->
- 	<!--
-	<changeSet id="vdot-2016-08-02-12-21" author="raff">
-		<preConditions onFail="MARK_RAN">
-			<not><tableExists tableName="vdot_item"/></not>
-		</preConditions>
-		<comment>
-			Creating the vdot_item table
-		</comment>
-		<createTable tableName="vdot_item">
-			<column name="vdot_item_id" type="int" autoIncrement="true">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="uuid" type="char(38)">
-				<constraints nullable="false" unique="true"></constraints>
-			</column>
-			<column name="owner" type="int" />
-			<column name="description" type="varchar(255)" />
-		</createTable>
-        <addForeignKeyConstraint constraintName="vdot_item_owner_fk" baseTableName="vdot_item" baseColumnNames="owner"  referencedTableName="users"
-                                 referencedColumnNames="user_id" />
-    </changeSet> -->
+
     <!--Adding scheduled task to push patient info to vdot system-->
     <changeSet id="kenyaemr_vdot_001" author="makombe">
         <preConditions onFail="MARK_RAN">

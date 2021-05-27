@@ -81,7 +81,11 @@ public class VdotDataExchange {
 		
 		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
 		Integer encounterId = (Integer) queryData.get(0).get(0);
-		Encounter lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
+		Encounter lastDrugOrderEncounter = null;
+		
+		if (encounterId != null) {
+			lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
+		}
 		String frequency = "";
 		
 		if (lastDrugOrderEncounter != null) {
