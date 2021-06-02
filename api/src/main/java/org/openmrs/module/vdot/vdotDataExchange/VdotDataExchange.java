@@ -434,6 +434,8 @@ public class VdotDataExchange {
 						Map<String, List<String>> groupedVideoTimeStamps = null;
 						try {
 							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");
+							String patientStatus = patientArrayNode.get(i).get("patientStatus") != null ? patientArrayNode
+							        .get(i).get("patientStatus").asText() : "";
 							
 							groupedVideoTimeStamps = Utils.groupVideoTimeStampsByDay(patientArrayNode.get(i)
 							        .get("videosTimestamps").toString());
@@ -442,11 +444,14 @@ public class VdotDataExchange {
 									List<String> vTimestamps = (List<String>) entry.getValue();
 									NimeconfirmVideoObs videoObs = new NimeconfirmVideoObs();
 									
-									if (patient != null && vTimestamps.size() > 0) {
+									if (patient != null && vTimestamps.size() > 0 && StringUtils.isNotBlank(patientStatus)) {
 										videoObs.setTimeStamp(StringUtils.join(vTimestamps, ","));
 										videoObs.setPatient(patient);
-										videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
-										videoObs.setPatientStatus(patientArrayNode.get(i).get("patientStatus").asText());
+										if (patientArrayNode.get(i).get("adherenceScore") != null) {
+											videoObs.setScore(patientArrayNode.get(i).get("adherenceScore").asDouble());
+											
+										}
+										videoObs.setPatientStatus(patientStatus);
 										videoObs.setDate(vformatter.parse(entry.getKey().toString()));
 										iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 										message = "Incoming vdot data processed successfully";

@@ -14,7 +14,6 @@
 
 package org.openmrs.module.vdot.fragment.controller;
 
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +48,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-
 
 /**
  * Controller for vdot patient data fragment
@@ -92,14 +90,13 @@ public class VdotPatientDataFragmentController {
 		}
 		return message;
 	}
-
 	
 	public void getNimeConfirmVideoObs() throws IOException {
-
+		
 		GlobalProperty gpServerUrl = Context.getAdministrationService().getGlobalPropertyObject(
-				VdotMetadata.VDOT_OBSERVATION_GET_API);
+		    VdotMetadata.VDOT_OBSERVATION_GET_API);
 		String serverUrl = gpServerUrl.getPropertyValue();
-
+		
 		if (StringUtils.isBlank(serverUrl)) {
 			System.out.println("Please set credentials for pulling vdot observations");
 			return;
@@ -111,7 +108,7 @@ public class VdotPatientDataFragmentController {
 			URIBuilder builder = new URIBuilder(serverUrl);
 			builder.setParameter("mflCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation())).setParameter(
 			    "timestamp", "");
-
+			
 			HttpGet getRequest = new HttpGet(builder.build());
 			getRequest.addHeader("content-type", "application/json");
 			CloseableHttpResponse response = httpClient.execute(getRequest);
@@ -131,7 +128,7 @@ public class VdotPatientDataFragmentController {
 			finally {
 				response.close();
 			}
-
+			
 		}
 		catch (URISyntaxException e) {
 			e.printStackTrace();
