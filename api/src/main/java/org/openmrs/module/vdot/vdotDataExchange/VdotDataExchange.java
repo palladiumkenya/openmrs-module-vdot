@@ -415,7 +415,13 @@ public class VdotDataExchange {
 		
 		return countyCode;
 	}
-	
+
+
+    /**
+     * Processes video observations fetched from nimeConfirm server and persist the data to
+     * kenyaemr_vdot_nimeconfirm_video_obs model
+     *
+     */
 	public static String processVideoObs(String payload) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode jsonNode = null;
