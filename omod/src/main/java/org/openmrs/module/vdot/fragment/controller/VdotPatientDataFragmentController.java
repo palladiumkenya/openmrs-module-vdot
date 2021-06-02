@@ -54,17 +54,14 @@ public class VdotPatientDataFragmentController {
 	private String url = "http://www.google.com:80/index.html";
 	
 	private final Log log = LogFactory.getLog(DataManagementPageController.class);
-
-
+	
 	public void controller(PageModel model) {
 		
 	}
-
-
+	
 	/**
-	 * Fetch patient video observations from nimeConfirm server
-	 * based on timestamp and facility mflcode
-	 *
+	 * Fetch patient video observations from nimeConfirm server based on timestamp and facility
+	 * mflcode
 	 */
 	
 	public void getNimeConfirmVideoObs() throws IOException {

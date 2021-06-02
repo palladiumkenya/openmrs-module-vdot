@@ -133,12 +133,13 @@ public class VdotDataExchange {
 			payload.put("facilityCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
 			payload.put("cccNo", cccNumber != null ? cccNumber.getIdentifier() : "");
 			payload.put("dob", dob);
-			payload.put("regimen", regimenName.replace("/", "+"));
+			payload.put("regimen", nascopCode != null || StringUtils.isNotBlank(nascopCode) ? nascopCode
+			        : regimenName != null ? regimenName : "");
 			// payload.put("drug_code", nascopCode != null ? nascopCode : "");
 			payload.put("phoneNumber", phoneNumber != null || StringUtils.isNotBlank(phoneNumber) ? phoneNumber
 			        : nextOfKinPhoneNumber != null ? nextOfKinPhoneNumber : "");
 			payload.put("firstName", patient.getGivenName());
-			payload.put("middleName", patient.getMiddleName());
+			payload.put("middleName", patient.getMiddleName() != null ? patient.getMiddleName() : "");
 			payload.put("surname", patient.getFamilyName());
 			payload.put("currentVl",
 			    vl != null && vl.get("lastVl") != null ? vl.get("lastVl").toString().replace("copies/ml", "") : "");
@@ -415,13 +416,11 @@ public class VdotDataExchange {
 		
 		return countyCode;
 	}
-
-
-    /**
-     * Processes video observations fetched from nimeConfirm server and persist the data to
-     * kenyaemr_vdot_nimeconfirm_video_obs model
-     *
-     */
+	
+	/**
+	 * Processes video observations fetched from nimeConfirm server and persist the data to
+	 * kenyaemr_vdot_nimeconfirm_video_obs model
+	 */
 	public static String processVideoObs(String payload) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode jsonNode = null;
