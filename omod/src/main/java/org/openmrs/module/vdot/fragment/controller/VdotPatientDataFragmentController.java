@@ -14,11 +14,17 @@
 
 package org.openmrs.module.vdot.fragment.controller;
 
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+
+import org.apache.http.client.utils.URIBuilder;
+
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,17 +35,21 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.page.controller.DataManagementPageController;
+import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
 import org.openmrs.ui.framework.page.PageModel;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+
 
 /**
  * Controller for vdot patient data fragment
@@ -47,6 +57,8 @@ import java.net.URLConnection;
 public class VdotPatientDataFragmentController {
 	
 	public static final String VDOT_PATIENTS_DATA_SERVER_URL = "http://197.248.92.42:88/kenyaemr/patients_data";
+	
+	private String url = "http://www.google.com:80/index.html";
 	
 	private final Log log = LogFactory.getLog(DataManagementPageController.class);
 	
@@ -80,14 +92,27 @@ public class VdotPatientDataFragmentController {
 		}
 		return message;
 	}
+
 	
-	private static String getVdotNimeConfirmVideoObs() throws IOException {
-		String vdotServerUrl = Context.getAdministrationService().getGlobalProperty(VDOT_PATIENTS_DATA_SERVER_URL);
+	public void getNimeConfirmVideoObs() throws IOException {
+
+		GlobalProperty gpServerUrl = Context.getAdministrationService().getGlobalPropertyObject(
+				VdotMetadata.VDOT_OBSERVATION_GET_API);
+		String serverUrl = gpServerUrl.getPropertyValue();
+
+		if (StringUtils.isBlank(serverUrl)) {
+			System.out.println("Please set credentials for pulling vdot observations");
+			return;
+		}
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(SSLContexts.createDefault(),
 		        new String[] { "TLSv1.2" }, null, SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 		CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 		try {
-			HttpGet getRequest = new HttpGet(vdotServerUrl);
+			URIBuilder builder = new URIBuilder(serverUrl);
+			builder.setParameter("mflCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation())).setParameter(
+			    "timestamp", "");
+
+			HttpGet getRequest = new HttpGet(builder.build());
 			getRequest.addHeader("content-type", "application/json");
 			CloseableHttpResponse response = httpClient.execute(getRequest);
 			int statusCode = response.getStatusLine().getStatusCode();
@@ -99,18 +124,22 @@ public class VdotPatientDataFragmentController {
 				HttpEntity entity = response.getEntity();
 				if (entity != null) {
 					result = EntityUtils.toString(entity);
+					VdotDataExchange.processVideoObs(result);
 				}
 				
 			}
 			finally {
 				response.close();
 			}
-			return result;
-			
+
+		}
+		catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
 		finally {
 			httpClient.close();
 		}
+		
 	}
 	
 	private boolean checkInternetConnectionStatus() {
