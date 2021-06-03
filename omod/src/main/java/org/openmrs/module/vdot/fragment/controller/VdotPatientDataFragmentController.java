@@ -14,6 +14,9 @@
 
 package org.openmrs.module.vdot.fragment.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,6 +57,8 @@ public class VdotPatientDataFragmentController {
 	private String url = "http://www.google.com:80/index.html";
 	
 	private final Log log = LogFactory.getLog(DataManagementPageController.class);
+	GlobalProperty gpTimeStamp = Context.getAdministrationService().getGlobalPropertyObject(
+			"vdotVideoMessages.lastFetchDateAndTime"); // this will store the last time stamp prior to fetching data
 	
 	public void controller(PageModel model) {
 		
@@ -69,6 +74,7 @@ public class VdotPatientDataFragmentController {
 		GlobalProperty gpServerUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    VdotMetadata.VDOT_OBSERVATION_GET_API);
 		String serverUrl = gpServerUrl.getPropertyValue();
+		String timeStamp = gpTimeStamp.getPropertyValue();
 		
 		if (StringUtils.isBlank(serverUrl)) {
 			System.out.println("Please set credentials for pulling vdot observations");
@@ -80,7 +86,7 @@ public class VdotPatientDataFragmentController {
 		try {
 			URIBuilder builder = new URIBuilder(serverUrl);
 			builder.setParameter("mflCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation())).setParameter(
-			    "timestamp", "");
+			    "timestamp", timeStamp);
 			
 			HttpGet getRequest = new HttpGet(builder.build());
 			getRequest.addHeader("content-type", "application/json");
@@ -95,6 +101,7 @@ public class VdotPatientDataFragmentController {
 				if (entity != null) {
 					result = EntityUtils.toString(entity);
 					VdotDataExchange.processVideoObs(result);
+					setVdotTimeStampGlobalProperty(result);
 				}
 				
 			}
@@ -110,6 +117,23 @@ public class VdotPatientDataFragmentController {
 			httpClient.close();
 		}
 		
+	}
+	private void setVdotTimeStampGlobalProperty(String payload) {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode jsonNode = null;
+		try {
+			jsonNode = mapper.readTree(payload);
+			if (jsonNode != null) {
+				String lastFetchTimeStamp = jsonNode.get("timestamp").asText();
+				gpTimeStamp.setPropertyValue(lastFetchTimeStamp);
+				Context.getAdministrationService().saveGlobalProperty(gpTimeStamp);
+
+			}
+
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	private boolean checkInternetConnectionStatus() {
