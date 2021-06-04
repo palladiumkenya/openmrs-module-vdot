@@ -134,8 +134,7 @@ public class PushPatientInfoToVdotTask extends AbstractTask {
 		VdotDataExchange e = new VdotDataExchange();
 		ObjectNode payload = e.generatePayloadForVdot(patient);
 		Date date = new Date();
-		NimeconfirmEnrolment outMsg = new NimeconfirmEnrolment(patient, payload.toString(), "Pending", "",
-		        "", date, "");
+		NimeconfirmEnrolment outMsg = new NimeconfirmEnrolment(patient, payload.toString(), "Pending", "", "", date, "");
 		nimeconfirmService.saveNimeconfirmEnrolment(outMsg);
 		
 	}

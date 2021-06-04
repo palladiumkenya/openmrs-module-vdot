@@ -28,10 +28,9 @@ import java.util.Set;
 
 /**
  * Vdot program eligibility calculation. Eligibility criteria: patient must be on ART
- *
  */
 public class EligibleForVdotProgramCalculation extends AbstractPatientCalculation implements PatientCalculation {
-	
+
 	@Override
 	public CalculationResultMap evaluate(Collection<Integer> cohort, Map<String, Object> parameterValues,
 	        PatientCalculationContext context) {
