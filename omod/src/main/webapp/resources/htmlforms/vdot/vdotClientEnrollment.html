@@ -16,6 +16,21 @@
 
     <script type="text/javascript" src="../moduleResources/kenyaemr/scripts/moment.js"></script>
     <script type="text/javascript">
+        jq(function() {
+            jq('#other-referral-reason').hide();
+            jq('#referral-reasons :input[type=checkbox]').click(reasonsForReferral);
+
+
+        });
+        function reasonsForReferral() {
+
+            if(getValue('reason-other.value') ==5622) {
+                jq('#other-referral-reason').show();
+            }else {
+                jq('#other-referral-reason').hide();
+            }
+
+        }
 
     </script>
 
@@ -70,6 +85,39 @@
                              answerConceptIds="1065,1066,"
                              answerLabels="Yes,No"
                                 style="dropdown" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Reason for referral</td>
+                    <td>
+                        <div id="referral-reasons" style="float: left; padding-right: 50px">
+                        <obs conceptId="1887" id="adherence"
+                             answerConceptId="164075AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Sub optimal adherence" style="checkbox"/>
+                        <br />
+                        <obs conceptId="1887"
+                             answerConceptId="165240"
+                             answerLabel="Newly initiating ART" id="initiating-art"
+                             style="checkbox"/>
+                        <br />
+                        <obs conceptId="1887"
+                             answerConceptId="5619AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Unstable Caregiver" id="care-giver"
+                             style="checkbox"/>
+                        <br />
+                        <obs conceptId="1887"
+                             answerConceptId="989AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Age 0-4 years" id="patient-age"
+                             style="checkbox"/>
+                        <br />
+                        <obs conceptId="1887"
+                             answerConceptId="5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                             answerLabel="Other" id="reason-other"
+                             style="checkbox"/>
+                        <obs id="other-referral-reason" conceptId="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
+                        <br />
+                        </div>
+
                     </td>
                 </tr>
                </table>
