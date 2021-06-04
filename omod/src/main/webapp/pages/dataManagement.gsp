@@ -51,14 +51,13 @@
 
     </div>
     <div class="mainBox boxStyle" style="margin-top: 50px; width: 90%">
-        Something here for pulling data
-
-
 
         <br/>
         <br/>
+        <span id="msgBox2" style="color: green"></span><br/>
+        <button  id="pullMessagesFromVdot">Pull data from server</button>
+
         <br/>
-        <button style="border: solid" id="pullMessagesFromVdot">Pull data</button>
     </div>
 </div>
 
@@ -69,10 +68,10 @@
         jq('#pullMessagesFromVdot').click(function() {
             jq.getJSON('${ ui.actionLink("vdot", "vdotPatientData", "getNimeConfirmVideoObs") }')
                 .success(function(data) {
-                    jq('#msgBox').html("Vdot messages processed successfully");
+                    jq('#msgBox2').html("Vdot data pulled successfully");
                 })
                 .error(function(xhr, status, err) {
-                    jq('#msgBox').html("There was an error processing Vdot messages");
+                    jq('#msgBox2').html("There was an error pulling Vdot messages");
                 })
         });
 
