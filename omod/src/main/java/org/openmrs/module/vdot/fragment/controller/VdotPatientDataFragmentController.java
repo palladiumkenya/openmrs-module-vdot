@@ -57,8 +57,9 @@ public class VdotPatientDataFragmentController {
 	private String url = "http://www.google.com:80/index.html";
 	
 	private final Log log = LogFactory.getLog(DataManagementPageController.class);
+	
 	GlobalProperty gpTimeStamp = Context.getAdministrationService().getGlobalPropertyObject(
-			"vdotVideoMessages.lastFetchDateAndTime"); // this will store the last time stamp prior to fetching data
+	    "vdotVideoMessages.lastFetchDateAndTime"); // this will store the last time stamp prior to fetching data
 	
 	public void controller(PageModel model) {
 		
@@ -118,6 +119,7 @@ public class VdotPatientDataFragmentController {
 		}
 		
 	}
+	
 	private void setVdotTimeStampGlobalProperty(String payload) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode jsonNode = null;
@@ -127,13 +129,14 @@ public class VdotPatientDataFragmentController {
 				String lastFetchTimeStamp = jsonNode.get("timestamp").asText();
 				gpTimeStamp.setPropertyValue(lastFetchTimeStamp);
 				Context.getAdministrationService().saveGlobalProperty(gpTimeStamp);
-
+				
 			}
-
-		} catch (JsonProcessingException e) {
+			
+		}
+		catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
 	
 	private boolean checkInternetConnectionStatus() {
