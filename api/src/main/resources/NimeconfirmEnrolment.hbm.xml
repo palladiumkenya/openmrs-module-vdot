@@ -15,6 +15,9 @@
 			<property name="payLoad" type ="java.lang.String" column ="payload" length="65535"/>
 			<property name="date" type="java.util.Date" column="date"/>
 			<property name="status" type="java.lang.String" column="status" length="255"/>
+			<property name="reason" type="java.lang.String" column="reason" length="255"/>
+			<property name="reasonOther" type="java.lang.String" column="reason_other" length="300"/>
+			<property name="type" type="java.lang.String" column="type" length="255"/>
 			<many-to-one name="creator" class="org.openmrs.User" column="created_by"/>
       		<property name="dateCreated" type="java.util.Date" column="date_created" length="19"/>
 			<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>

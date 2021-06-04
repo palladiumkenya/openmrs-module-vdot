@@ -19,16 +19,26 @@ public class NimeconfirmEnrolment extends BaseOpenmrsData {
 	
 	private String status;
 	
+	private String reason;
+	
+	private String reasonOther;
+	
+	private String type;
+	
 	private Date date;
 	
 	public NimeconfirmEnrolment() {
 	}
 	
-	public NimeconfirmEnrolment(Patient patient, String payLoad, String status, Date date) {
+	public NimeconfirmEnrolment(Patient patient, String payLoad, String status, String reason, String reasonOther,
+	    Date date, String type) {
 		this.patient = patient;
 		this.payLoad = payLoad;
 		this.status = status;
+		this.reason = reason;
+		this.reasonOther = reasonOther;
 		this.date = date;
+		this.type = type;
 	}
 	
 	public Patient getPatient() {
@@ -154,5 +164,29 @@ public class NimeconfirmEnrolment extends BaseOpenmrsData {
 	@Override
 	public void setVoidReason(String voidReason) {
 		super.setVoidReason(voidReason);
+	}
+	
+	public String getReason() {
+		return reason;
+	}
+	
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+	
+	public String getReasonOther() {
+		return reasonOther;
+	}
+	
+	public void setReasonOther(String reasonOther) {
+		this.reasonOther = reasonOther;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
 	}
 }
