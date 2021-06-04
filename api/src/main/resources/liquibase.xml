@@ -60,6 +60,15 @@
             <column name="status" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="reason" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reason_other" type="varchar(300)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="date" type="datetime">
                 <constraints nullable="false"/>
             </column>
