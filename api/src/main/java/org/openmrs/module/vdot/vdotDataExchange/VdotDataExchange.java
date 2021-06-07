@@ -16,6 +16,7 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.json.simple.JSONArray;
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
+import org.openmrs.module.kenyaemr.util.EmrUtils;
 import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl;
@@ -122,6 +123,7 @@ public class VdotDataExchange {
 		ObjectNode address = Utils.getPatientAddress(patient);
 		String phoneNumber = Utils.getPatientPhoneNumber(patient);
 		String nextOfKinPhoneNumber = Utils.getPatientNextOfKinPhoneNumber(patient);
+		ObjectNode reason = extractEnrollmentReasonToVdotProgram(patient);
 		
 		String nascopCode = "";
 		if (StringUtils.isNotBlank(regimenName)) {
@@ -133,8 +135,7 @@ public class VdotDataExchange {
 			payload.put("facilityCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation()));
 			payload.put("cccNo", cccNumber != null ? cccNumber.getIdentifier() : "");
 			payload.put("dob", dob);
-			payload.put("regimen", nascopCode != null || StringUtils.isNotBlank(nascopCode) ? nascopCode
-			        : regimenName != null ? regimenName : "");
+			payload.put("regimen", StringUtils.isNotBlank(nascopCode) ? nascopCode : regimenName != null ? regimenName : "");
 			// payload.put("drug_code", nascopCode != null ? nascopCode : "");
 			payload.put("phoneNumber", phoneNumber != null || StringUtils.isNotBlank(phoneNumber) ? phoneNumber
 			        : nextOfKinPhoneNumber != null ? nextOfKinPhoneNumber : "");
@@ -151,6 +152,8 @@ public class VdotDataExchange {
 			payload.put("countyCode", getCountyCodes(address.get("COUNTY").textValue().toLowerCase()));
 			payload.put("subcounty", address.get("SUB_COUNTY").textValue());
 			payload.put("gender", patient.getGender());
+			payload.put("reasonForEnrollment", reason.get("reason").textValue());
+			payload.put("reasonForEnrollmentOther", reason.get("reasonOther").textValue());
 			
 		}
 		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
@@ -415,6 +418,49 @@ public class VdotDataExchange {
 		}
 		
 		return countyCode;
+	}
+	
+	private ObjectNode extractEnrollmentReasonToVdotProgram(Patient patient) {
+		Encounter lastEnrollmentEncounter = EmrUtils.lastEncounter(patient, Context.getEncounterService()
+		        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_ENROLLMENT), Context.getFormService()
+		        .getFormByUuid(VdotMetadata._Form.VDOT_ENROLLMENT));
+		Set<Obs> enrollmentObs = lastEnrollmentEncounter.getObs();
+		StringBuilder sbReason = new StringBuilder();
+		String reasonOther = "";
+		ObjectNode enrollmentReasonNode = getJsonNodeFactory().objectNode();
+		
+		for (Obs obs : enrollmentObs) {
+			
+			if (obs.getConcept().getConceptId() == 1887) {
+				if (obs.getValueCoded().getConceptId() == 165240) {
+					sbReason.append("Newly initiating ART");
+					sbReason.append(",");
+					
+				} else if (obs.getValueCoded().getConceptId() == 164075) {
+					sbReason.append("Sub optimal adherence");
+					sbReason.append(",");
+					
+				} else if (obs.getValueCoded().getConceptId() == 5619) {
+					sbReason.append("Unstable Caregiver");
+					sbReason.append(",");
+					
+				} else if (obs.getValueCoded().getConceptId() == 989) {
+					sbReason.append("Age 0-4 years");
+					sbReason.append(",");
+					
+				}
+				
+			}
+			
+			if (obs.getConcept().getConceptId() == 160632) {
+				reasonOther = obs.getValueText();
+			}
+			
+		}
+		enrollmentReasonNode.put("reason", sbReason.length() > 0 ? sbReason.substring(0, sbReason.length() - 1) : "");
+		enrollmentReasonNode.put("reasonOther", reasonOther);
+		
+		return enrollmentReasonNode;
 	}
 	
 	/**
