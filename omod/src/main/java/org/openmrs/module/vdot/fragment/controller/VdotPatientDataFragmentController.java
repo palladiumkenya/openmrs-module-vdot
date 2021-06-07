@@ -87,7 +87,7 @@ public class VdotPatientDataFragmentController {
 		try {
 			URIBuilder builder = new URIBuilder(serverUrl);
 			builder.setParameter("mflCode", Utils.getDefaultLocationMflCode(Utils.getDefaultLocation())).setParameter(
-			    "timestamp", timeStamp);
+			    "timestamp", "\"" + timeStamp + "\"");
 			
 			HttpGet getRequest = new HttpGet(builder.build());
 			getRequest.addHeader("content-type", "application/json");
