@@ -13,6 +13,8 @@
  */
 
 package org.openmrs.module.vdot.calculation;
+import org.openmrs.api.context.Context;
+import org.openmrs.api.PersonService;
 
 import org.openmrs.calculation.patient.PatientCalculation;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -27,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Vdot program eligibility calculation. Eligibility criteria: patient must be on ART
+ * Vdot program eligibility calculation. Eligibility criteria: patient must be on ART, between 0 and 19 years
  */
 public class EligibleForVdotProgramCalculation extends AbstractPatientCalculation implements PatientCalculation {
 	
@@ -37,11 +39,14 @@ public class EligibleForVdotProgramCalculation extends AbstractPatientCalculatio
 		CalculationResultMap ret = new CalculationResultMap();
 		Set<Integer> alive = Filters.alive(cohort, context);
 		CalculationResultMap onArt = calculate(new OnArtCalculation(), cohort, context);
+		PersonService personService = Context.getPersonService();
+		Integer age;
 		
 		for (int ptId : cohort) {
+			age = personService.getPerson(ptId).getAge();
 			boolean eligible = false;
 			
-			if (alive.contains(ptId) && !onArt.values().isEmpty()) {
+			if (alive.contains(ptId) && !onArt.values().isEmpty() && age <= 19) {
 				
 				eligible = true;
 			}
