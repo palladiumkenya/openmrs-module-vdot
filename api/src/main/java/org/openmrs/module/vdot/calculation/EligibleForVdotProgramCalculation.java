@@ -13,6 +13,7 @@
  */
 
 package org.openmrs.module.vdot.calculation;
+
 import org.openmrs.api.context.Context;
 import org.openmrs.api.PersonService;
 
@@ -29,7 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Vdot program eligibility calculation. Eligibility criteria: patient must be on ART, between 0 and 19 years
+ * Vdot program eligibility calculation. Eligibility criteria: patient must be on ART, between 0 and
+ * 19 years
  */
 public class EligibleForVdotProgramCalculation extends AbstractPatientCalculation implements PatientCalculation {
 	
