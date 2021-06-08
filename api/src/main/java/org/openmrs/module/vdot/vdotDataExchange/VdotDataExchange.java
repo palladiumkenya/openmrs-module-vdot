@@ -566,26 +566,49 @@ public class VdotDataExchange {
 		
 		Encounter encounter = new Encounter();
 		Iterator<Map.Entry<String, JsonNode>> mapItr = baselineQuestionnairePayload.fields();
+		List<Obs> individualObsList = new ArrayList();
 		while (mapItr.hasNext()) {
 			Map.Entry<String, JsonNode> pair = mapItr.next();
 			if (StringUtils.isNotBlank(pair.getValue().asText())) {
 				Integer conceptId = Utils.conceptNameToIdMapper(pair.getKey());
+				
 				Obs o = new Obs();
-				o.setConcept(cs.getConcept(conceptId));
-				o.setDateCreated(new Date());
-				o.setCreator(Context.getAuthenticatedUser());
-				o.setObsDatetime(new Date());
-				o.setPerson(patient);
-				if (conceptId == 164992 || conceptId == 160632 || conceptId == 162725) {
-					o.setValueText(pair.getValue().asText());
+				
+				if (conceptId == 159892 || conceptId == 159424 || conceptId == 5587) {
+					ArrayNode arrNode = handleMultiSelectOptions(pair.getValue().asText());
 					
-				} else if (conceptId == 162523) {
-					o.setValueNumeric((pair.getValue().doubleValue()));
+					for (JsonNode i : arrNode) {
+						Obs obs = new Obs();
+						obs.setConcept(cs.getConcept(conceptId));
+						obs.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(i.asText())));
+						obs.setDateCreated(new Date());
+						obs.setCreator(Context.getAuthenticatedUser());
+						obs.setObsDatetime(new Date());
+						obs.setPerson(patient);
+						individualObsList.add(obs);
+					}
 					
 				} else {
-					o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(pair.getValue().asText())));
+					
+					o.setConcept(cs.getConcept(conceptId));
+					o.setDateCreated(new Date());
+					o.setCreator(Context.getAuthenticatedUser());
+					o.setObsDatetime(new Date());
+					o.setPerson(patient);
+					if (conceptId == 164992 || conceptId == 160632 || conceptId == 162725) {
+						o.setValueText(pair.getValue().asText());
+						
+					} else if (conceptId == 162523) {
+						o.setValueNumeric((pair.getValue().doubleValue()));
+						
+					} else {
+						o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(pair.getValue().asText())));
+						
+					}
+					individualObsList.add(o);
 					
 				}
+				
 				encounter.setPatient(patient);
 				encounter.setLocation(location);
 				encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService()
@@ -594,12 +617,27 @@ public class VdotDataExchange {
 				encounter.setEncounterDatetime(new Date());
 				encounter.setDateCreated(new Date());
 				encounter.setForm(baselineQuestionnaireForm);
-				encounter.addObs(o);
+				
+				for (Obs individualObs : individualObsList) {
+					encounter.addObs(individualObs);
+				}
 			}
 			
 		}
 		
 		Context.getEncounterService().saveEncounter(encounter);
+		
+	}
+	
+	private static ArrayNode handleMultiSelectOptions(String multiSelectOptions) {
+		ArrayNode arrNode = getJsonNodeFactory().arrayNode();
+		if (StringUtils.isNotBlank(multiSelectOptions)) {
+			for (String s : multiSelectOptions.split(",")) {
+				arrNode.add(s);
+			}
+		}
+		
+		return arrNode;
 		
 	}
 	
