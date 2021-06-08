@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 //import org.codehaus.jackson.map.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BaseJsonNode;
@@ -51,6 +53,22 @@ public class VdotDataExchange {
 	Program vdotProgram = MetadataUtils.existing(Program.class, VdotMetadata._Program.VDOT_PROGRAM);
 	
 	ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
+	
+	private static ConceptService cs = Context.getConceptService();
+	
+	private static EncounterService encounterService = Context.getEncounterService();
+	
+	Form vdotDiscontinuationForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION);
+	
+	private static Form baselineQuestionnaireForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_BASELINE);
+	
+	private static Location location = Utils.getDefaultLocation();
+	
+	private static EncounterType baselineEncounter = encounterService
+	        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_BASELINE_ENCOUNTER);
+	
+	EncounterType discEncounter = encounterService
+	        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION);
 	
 	public static final Locale LOCALE = Locale.ENGLISH;
 	
@@ -171,18 +189,7 @@ public class VdotDataExchange {
 		org.codehaus.jackson.node.ObjectNode jsonNode = null;
 		
 		// Consume read data
-		ConceptService cs = Context.getConceptService();
 		
-		EncounterService encounterService = Context.getEncounterService();
-		
-		Form vdotDiscontinuationForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION);
-		Form baselineQuestionnaireForm = Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_BASELINE);
-		Location location = Utils.getDefaultLocation();
-		EncounterType baselineEncounter = encounterService
-		        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_BASELINE_ENCOUNTER);
-		
-		EncounterType discEncounter = encounterService
-		        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION);
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		String message = "";
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -348,15 +355,15 @@ public class VdotDataExchange {
 		return message;
 		
 	}
-
-
+	
 	/**
 	 * Returns a county's code
+	 * 
 	 * @param name
 	 * @return
 	 */
 	private String getCountyCodes(String name) {
-
+		
 		ArrayNode countyListNode = Utils.getCountyCodes();
 		String countyName = "";
 		String countyCode = "";
@@ -430,6 +437,7 @@ public class VdotDataExchange {
 				if (patientArrayNode.size() > 0) {
 					for (int i = 0; i < patientArrayNode.size(); i++) {
 						String ccc = patientArrayNode.get(i).get("cccNo").asText();
+						ObjectNode questionnairePayload = (ObjectNode) patientArrayNode.get(i).get("baselineQuestionnaire");
 						Patient patient = Context.getPatientService().identifierInUse(ccc,
 						    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
 						Map<String, List<String>> groupedVideoTimeStamps = null;
@@ -456,8 +464,13 @@ public class VdotDataExchange {
 										videoObs.setDate(vformatter.parse(entry.getKey().toString()));
 										iNimeconfirmService.saveNimeconfirmVideoObs(videoObs);
 										message = "Incoming vdot data processed successfully";
+										
 									}
 								}
+								
+							}
+							if (patient != null && !questionnairePayload.isEmpty()) {
+								processBaselineQuestionnaire(questionnairePayload, patient);
 								
 							}
 							
@@ -479,28 +492,29 @@ public class VdotDataExchange {
 		return message;
 		
 	}
-
+	
 	/**
 	 * Process VDOT program discontinuation data
-	 *
 	 */
-	private static void discontinuePatientFromVdotProgram(Patient patient, Date discontinuationDate, String discontinuationReason) {
-
+	private static void discontinuePatientFromVdotProgram(Patient patient, Date discontinuationDate,
+	        String discontinuationReason) {
+		
 		PatientProgram lastEnrollment = getActiveProgram(patient, VdotMetadata._Program.VDOT_PROGRAM);
 		if (lastEnrollment != null) {
 			lastEnrollment.setDateCompleted(discontinuationDate);
 			Context.getProgramWorkflowService().savePatientProgram(lastEnrollment);
 		}
-
+		
 		Encounter enc = new Encounter();
-		enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION));
+		enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(
+		    VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION));
 		enc.setEncounterDatetime(discontinuationDate);
 		enc.setPatient(patient);
 		enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
 		enc.setForm(Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION));
-
+		
 		// set discontinuation reason
-
+		
 		ConceptService conceptService = Context.getConceptService();
 		Obs o = new Obs();
 		o.setConcept(conceptService.getConcept(161555));
@@ -509,7 +523,7 @@ public class VdotDataExchange {
 		o.setLocation(enc.getLocation());
 		o.setObsDatetime(discontinuationDate);
 		o.setPerson(patient);
-
+		
 		//TODO: please match the strings as they come from vdot
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(discontinuationReason)) {
 			if (discontinuationReason.equalsIgnoreCase("DISCHARGE")) {
@@ -526,20 +540,67 @@ public class VdotDataExchange {
 				o.setValueCoded(conceptService.getConcept(1067)); // unknown
 			}
 		}
-
+		
 		enc.addObs(o);
 		Context.getEncounterService().saveEncounter(enc);
 	}
-
+	
 	/**
 	 * Checks if a contact is enrolled in a program
+	 * 
 	 * @param patient
 	 * @return
 	 */
 	public static PatientProgram getActiveProgram(Patient patient, String programUUID) {
 		ProgramWorkflowService service = Context.getProgramWorkflowService();
-		List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null, null, null,null, true);
+		List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null,
+		    null, null, null, true);
 		return programs.size() > 0 ? programs.get(programs.size() - 1) : null;
+	}
+	
+	/**
+	 * Process VDOT baseline questionnaire data
+	 */
+	
+	private static void processBaselineQuestionnaire(ObjectNode baselineQuestionnairePayload, Patient patient) {
+		
+		Encounter encounter = new Encounter();
+		Iterator<Map.Entry<String, JsonNode>> mapItr = baselineQuestionnairePayload.fields();
+		while (mapItr.hasNext()) {
+			Map.Entry<String, JsonNode> pair = mapItr.next();
+			if (StringUtils.isNotBlank(pair.getValue().asText())) {
+				Integer conceptId = Utils.conceptNameToIdMapper(pair.getKey());
+				Obs o = new Obs();
+				o.setConcept(cs.getConcept(conceptId));
+				o.setDateCreated(new Date());
+				o.setCreator(Context.getAuthenticatedUser());
+				o.setObsDatetime(new Date());
+				o.setPerson(patient);
+				if (conceptId == 164992 || conceptId == 160632 || conceptId == 162725) {
+					o.setValueText(pair.getValue().asText());
+					
+				} else if (conceptId == 162523) {
+					o.setValueNumeric((pair.getValue().doubleValue()));
+					
+				} else {
+					o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(pair.getValue().asText())));
+					
+				}
+				encounter.setPatient(patient);
+				encounter.setLocation(location);
+				encounter.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService()
+				        .getProvider(1));
+				encounter.setEncounterType(baselineEncounter);
+				encounter.setEncounterDatetime(new Date());
+				encounter.setDateCreated(new Date());
+				encounter.setForm(baselineQuestionnaireForm);
+				encounter.addObs(o);
+			}
+			
+		}
+		
+		Context.getEncounterService().saveEncounter(encounter);
+		
 	}
 	
 }

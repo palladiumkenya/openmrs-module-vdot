@@ -225,6 +225,7 @@ public class Utils {
 	}
 	
 	public static Integer conceptNameToIdMapper(String name) {
+		Integer concept = null;
 		HashMap<String, Integer> conceptMap = new HashMap();
 		conceptMap.put("dateDiscontinued", 164384);
 		conceptMap.put("discontinuationReason", 161555);
@@ -234,26 +235,27 @@ public class Utils {
 		conceptMap.put("isAwareOfChildHivStatus", 159424);
 		conceptMap.put("othersWithHivAtHome", 5587);
 		conceptMap.put("schoolLevel", 1712);
-		conceptMap.put("schType", 159928);
+		//	conceptMap.put("schType", 159928);
+		conceptMap.put("boards", 159928); // TODO Vdot team to check on the response they provide for this question and also name the key appropriately
 		conceptMap.put("meansOfTransport", 1375);
 		conceptMap.put("incomeSource", 159740);
 		conceptMap.put("sourceOfWater", 1511);
 		//numeric
-		conceptMap.put("incomeAmount", 159776);
-		conceptMap.put("totalAtHome", 1474);
-		conceptMap.put("SchoolDistance", 1811);
+		conceptMap.put("incomeAmount", 164992);
+		conceptMap.put("totalAtHome", 160632);
+		conceptMap.put("schoolDistance", 162725);
 		conceptMap.put("noOfMeals", 162523);
 		//value boolean
-		conceptMap.put("goesToSchool", 5629);
-		conceptMap.put("toiletAccess", 159389);
+		conceptMap.put("goesToSchool", 159928);
+		conceptMap.put("toiletAccess", 160258);
 		if (conceptMap.containsKey(name)) {
-			return conceptMap.get(name);
-		} else {
-			return null;
+			concept = conceptMap.get(name);
 		}
+		return concept;
 	}
 	
 	public static Integer ansConceptNameToIdMapper(String name) {
+		Integer conceptAnswer = null;
 		HashMap<String, Integer> conceptMap = new HashMap();
 		conceptMap.put("Transferred Out", 159492);
 		conceptMap.put("Died", 160034);
@@ -270,7 +272,7 @@ public class Utils {
 		conceptMap.put("Non-natural causes", 123812);
 		conceptMap.put("Unknown cause", 142917);
 		conceptMap.put("Parent", 1527);
-		conceptMap.put("Grand Parent", 973);
+		conceptMap.put("Grand parents", 973);
 		conceptMap.put("Foster parent", 159894);
 		conceptMap.put("Relative", 5620);
 		conceptMap.put("Sibling", 972);
@@ -280,9 +282,9 @@ public class Utils {
 		conceptMap.put("Primary", 1713);
 		conceptMap.put("Secondary", 1714);
 		conceptMap.put("Tertiary", 159785);
-		conceptMap.put("Boards", 164211);
+		conceptMap.put("boards", 164211);
 		conceptMap.put("day", 164210);
-		conceptMap.put("Walk", 159310);
+		conceptMap.put("Walk to school", 159310);
 		conceptMap.put("Motorbike", 159744);
 		conceptMap.put("Bicycle", 159748);
 		conceptMap.put("Public transport", 1787);
@@ -296,70 +298,30 @@ public class Utils {
 		conceptMap.put("River", 1506);
 		conceptMap.put("Borehole", 1510);
 		conceptMap.put("Well", 1509);
+		conceptMap.put("Yes", 1065);
+		conceptMap.put("No", 1066);
 		if (conceptMap.containsKey(name)) {
-			return conceptMap.get(name);
-		} else {
-			return null;
+			conceptAnswer = conceptMap.get(name);
+			
 		}
+		return conceptAnswer;
 	}
-
+	
 	/**
 	 * Returns an array of counties and their codes
+	 * 
 	 * @return
 	 */
 	public static ArrayNode getCountyCodes() {
-
+		
 		ArrayNode countyListNode = getJsonNodeFactory().arrayNode();
-		List<String> countyNameList = Arrays.asList(
-				"Mombasa",
-				"Kwale",
-				"Kilifi",
-				"Tana River",
-				"Lamu",
-				"Taita-Taveta",
-				"Garissa",
-				"Wajir",
-				"Mandera",
-				"Marsabit",
-				"Isiolo",
-				"Meru",
-				"Tharaka-Nithi",
-				"Embu",
-				"Kitui",
-				"Machakos",
-				"Makueni",
-				"Nyandarua",
-				"Nyeri",
-				"Kirinyaga",
-				"Murang'a",
-				"Kiambu",
-				"Turkana",
-				"West Pokot",
-				"Samburu",
-				"Trans-Nzoia",
-				"Uasin Gishu",
-				"Elgeyo-Marakwet",
-				"Nandi",
-				"Baringo",
-				"Laikipia",
-				"Nakuru",
-				"Narok",
-				"Kajiado",
-				"Kericho",
-				"Bomet",
-				"Kakamega",
-				"Vihiga",
-				"Bungoma",
-				"Busia",
-				"Siaya",
-				"Kisumu",
-				"Homa Bay",
-				"Migori",
-				"Kisii",
-				"Nyamira",
-				"Nairobi"
-		);
-
+		List<String> countyNameList = Arrays.asList("Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita-Taveta",
+		    "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka-Nithi", "Embu", "Kitui", "Machakos",
+		    "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu",
+		    "Trans-Nzoia", "Uasin Gishu", "Elgeyo-Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado",
+		    "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii",
+		    "Nyamira", "Nairobi");
+		
 		//process the name list in the order that it appears. Distorting the order changes the mapped key
 		for (int i = 0; i < countyNameList.size(); i++) {
 			ObjectNode countyNode = getJsonNodeFactory().objectNode();
@@ -367,7 +329,7 @@ public class Utils {
 			countyNode.put("Code", i + 1);
 			countyListNode.add(countyNode);
 		}
-
+		
 		return countyListNode;
 	}
 	
