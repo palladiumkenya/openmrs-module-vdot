@@ -348,75 +348,25 @@ public class VdotDataExchange {
 		return message;
 		
 	}
-	
+
+
+	/**
+	 * Returns a county's code
+	 * @param name
+	 * @return
+	 */
 	private String getCountyCodes(String name) {
-		
-		String json = "{\"counties\":[\n" + "  {\n" + "    \"County\": \"Mombasa\",\n" + "    \"Code\": 1\n" + "  },\n"
-		        + "  {\n" + "    \"County\": \"Kwale\",\n" + "    \"Code\": 2\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kilifi\",\n" + "    \"Code\": 3\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Tana River\",\n" + "    \"Code\": 4\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Lamu\",\n" + "    \"Code\": 5\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Taita-Taveta\",\n" + "    \"Code\": 6\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Garissa\",\n" + "    \"Code\": 7\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Wajir\",\n" + "    \"Code\": 8\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Mandera\",\n" + "    \"Code\": 9\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Marsabit\",\n" + "    \"Code\": 10\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Isiolo\",\n" + "    \"Code\": 11\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Meru\",\n" + "    \"Code\": 12\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Tharaka-Nithi\",\n" + "    \"Code\": 13\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Embu\",\n" + "    \"Code\": 14\n" + "  },\n" + "  {\n" + "    \"County\": \"Kitui\",\n"
-		        + "    \"Code\": 15\n" + "  },\n" + "  {\n" + "    \"County\": \"Machakos\",\n" + "    \"Code\": 16\n"
-		        + "  },\n" + "  {\n" + "    \"County\": \"Makueni\",\n" + "    \"Code\": 17\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Nyandarua\",\n" + "    \"Code\": 18\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Nyeri\",\n" + "    \"Code\": 19\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kirinyaga\",\n" + "    \"Code\": 20\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Murang'a\",\n" + "    \"Code\": 21\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kiambu\",\n" + "    \"Code\": 22\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Turkana\",\n" + "    \"Code\": 23\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"West Pokot\",\n" + "    \"Code\": 24\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Samburu\",\n" + "    \"Code\": 25\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Trans-Nzoia\",\n" + "    \"Code\": 26\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Uasin Gishu\",\n" + "    \"Code\": 27\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Elgeyo-Marakwet\",\n" + "    \"Code\": 28\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Nandi\",\n" + "    \"Code\": 29\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Baringo\",\n" + "    \"Code\": 30\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Laikipia\",\n" + "    \"Code\": 31\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Nakuru\",\n" + "    \"Code\": 32\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Narok\",\n" + "    \"Code\": 33\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kajiado\",\n" + "    \"Code\": 34\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kericho\",\n" + "    \"Code\": 35\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Bomet\",\n" + "    \"Code\": 36\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kakamega\",\n" + "    \"Code\": 37\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Vihiga\",\n" + "    \"Code\": 38\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Bungoma\",\n" + "    \"Code\": 39\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Busia\",\n" + "    \"Code\": 40\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Siaya\",\n" + "    \"Code\": 41\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kisumu\",\n" + "    \"Code\": 42\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Homa Bay\",\n" + "    \"Code\": 43\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Migori\",\n" + "    \"Code\": 44\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Kisii\",\n" + "    \"Code\": 45\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Nyamira\",\n" + "    \"Code\": 46\n" + "  },\n" + "  {\n"
-		        + "    \"County\": \"Nairobi\",\n" + "    \"Code\": 47\n" + "  }\n" + "]\n" + "}";
-		
-		ObjectMapper mapper = new ObjectMapper(); //using jackson
-		JsonNode jsonNode = null;
+
+		ArrayNode countyListNode = Utils.getCountyCodes();
 		String countyName = "";
 		String countyCode = "";
-		try {
-			jsonNode = mapper.readTree(json);
-			ArrayNode arrayNode = (ArrayNode) jsonNode.get("counties");
-			for (int i = 0; i < arrayNode.size(); i++) {
-				countyName = arrayNode.get(i).get("County").toString().toLowerCase().replace("\"", "");
-				if (StringUtils.isNotBlank(countyName) && countyName.equals(name)) {
-					countyCode = arrayNode.get(i).get("Code").toString();
-					break;
-				}
+		for (int i = 0; i < countyListNode.size(); i++) {
+			countyName = countyListNode.get(i).get("County").toString().toLowerCase().replace("\"", "");
+			if (StringUtils.isNotBlank(countyName) && countyName.equals(name)) {
+				countyCode = countyListNode.get(i).get("Code").toString();
+				break;
 			}
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		return countyCode;
 	}
 	
@@ -528,6 +478,68 @@ public class VdotDataExchange {
 		}
 		return message;
 		
+	}
+
+	/**
+	 * Process VDOT program discontinuation data
+	 *
+	 */
+	private static void discontinuePatientFromVdotProgram(Patient patient, Date discontinuationDate, String discontinuationReason) {
+
+		PatientProgram lastEnrollment = getActiveProgram(patient, VdotMetadata._Program.VDOT_PROGRAM);
+		if (lastEnrollment != null) {
+			lastEnrollment.setDateCompleted(discontinuationDate);
+			Context.getProgramWorkflowService().savePatientProgram(lastEnrollment);
+		}
+
+		Encounter enc = new Encounter();
+		enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION));
+		enc.setEncounterDatetime(discontinuationDate);
+		enc.setPatient(patient);
+		enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
+		enc.setForm(Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION));
+
+		// set discontinuation reason
+
+		ConceptService conceptService = Context.getConceptService();
+		Obs o = new Obs();
+		o.setConcept(conceptService.getConcept(161555));
+		o.setDateCreated(new Date());
+		o.setCreator(Context.getUserService().getUser(1));
+		o.setLocation(enc.getLocation());
+		o.setObsDatetime(discontinuationDate);
+		o.setPerson(patient);
+
+		//TODO: please match the strings as they come from vdot
+		if (org.apache.commons.lang3.StringUtils.isNotBlank(discontinuationReason)) {
+			if (discontinuationReason.equalsIgnoreCase("DISCHARGE")) {
+				o.setValueCoded(conceptService.getConcept(159492));// transferred out
+			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+				o.setValueCoded(conceptService.getConcept(160034)); // dead
+			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+				o.setValueCoded(conceptService.getConcept(5240)); // Lost to followup
+			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+				o.setValueCoded(conceptService.getConcept(819)); // cannot afford treatment
+			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+				o.setValueCoded(conceptService.getConcept(5622)); // other
+			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+				o.setValueCoded(conceptService.getConcept(1067)); // unknown
+			}
+		}
+
+		enc.addObs(o);
+		Context.getEncounterService().saveEncounter(enc);
+	}
+
+	/**
+	 * Checks if a contact is enrolled in a program
+	 * @param patient
+	 * @return
+	 */
+	public static PatientProgram getActiveProgram(Patient patient, String programUUID) {
+		ProgramWorkflowService service = Context.getProgramWorkflowService();
+		List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null, null, null,null, true);
+		return programs.size() > 0 ? programs.get(programs.size() - 1) : null;
 	}
 	
 }

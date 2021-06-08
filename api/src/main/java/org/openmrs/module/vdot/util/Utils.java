@@ -3,8 +3,10 @@ package org.openmrs.module.vdot.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Set;
@@ -298,6 +301,74 @@ public class Utils {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Returns an array of counties and their codes
+	 * @return
+	 */
+	public static ArrayNode getCountyCodes() {
+
+		ArrayNode countyListNode = getJsonNodeFactory().arrayNode();
+		List<String> countyNameList = Arrays.asList(
+				"Mombasa",
+				"Kwale",
+				"Kilifi",
+				"Tana River",
+				"Lamu",
+				"Taita-Taveta",
+				"Garissa",
+				"Wajir",
+				"Mandera",
+				"Marsabit",
+				"Isiolo",
+				"Meru",
+				"Tharaka-Nithi",
+				"Embu",
+				"Kitui",
+				"Machakos",
+				"Makueni",
+				"Nyandarua",
+				"Nyeri",
+				"Kirinyaga",
+				"Murang'a",
+				"Kiambu",
+				"Turkana",
+				"West Pokot",
+				"Samburu",
+				"Trans-Nzoia",
+				"Uasin Gishu",
+				"Elgeyo-Marakwet",
+				"Nandi",
+				"Baringo",
+				"Laikipia",
+				"Nakuru",
+				"Narok",
+				"Kajiado",
+				"Kericho",
+				"Bomet",
+				"Kakamega",
+				"Vihiga",
+				"Bungoma",
+				"Busia",
+				"Siaya",
+				"Kisumu",
+				"Homa Bay",
+				"Migori",
+				"Kisii",
+				"Nyamira",
+				"Nairobi"
+		);
+
+		//process the name list in the order that it appears. Distorting the order changes the mapped key
+		for (int i = 0; i < countyNameList.size(); i++) {
+			ObjectNode countyNode = getJsonNodeFactory().objectNode();
+			countyNode.put("County", countyNameList.get(i)); // we are adding 1 to take care of zero-based index
+			countyNode.put("Code", i + 1);
+			countyListNode.add(countyNode);
+		}
+
+		return countyListNode;
 	}
 	
 }
