@@ -75,6 +75,30 @@
         }
 
     </script>
+    <style>
+        .simple-table {
+            border: solid 1px #DDEEEE;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font: normal 13px Arial, sans-serif;
+        }
+
+        .simple-table thead th {
+            background-color: #DDEFEF;
+            border: solid 1px #DDEEEE;
+            color: #336B6B;
+            padding: 10px;
+            text-align: left;
+            text-shadow: 1px 1px 1px #fff;
+        }
+
+        .simple-table td {
+            border: solid 1px #DDEEEE;
+            color: #333;
+            padding: 10px;
+            text-shadow: 1px 1px 1px #fff;
+        }
+    </style>
 
     <div class="ke-form-header">
         <table style="width: 100%">
@@ -127,16 +151,18 @@
         <fieldset>
             <legend>Social-economic status</legend>
 
-            <table>
+            <table class="simple-table">
                 <tr>
                     <td id="living-with-child">Who does the child currently live with?</td>
-                    <td>
-                        <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerConceptIds="1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Parent,Grand Parent,Foster parent,Relative,Sibling,Guardian"
-                             style="checkbox"/>
-
+                    <td colspan="3">
+                        <div style="float: left; padding-right: 50px">
+                            <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Parent" style="checkbox" /><br />
+                            <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Grand Parent" style="checkbox" /><br />
+                            <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Foster parent" style="checkbox" /><br />
+                            <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Relative" style="checkbox" /><br />
+                            <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Sibling" style="checkbox" /><br />
+                            <obs conceptId="159892AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Guardian" style="checkbox" /><br />
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -151,22 +177,29 @@
                 </tr>
                 <tr>
                     <td id="child-hiv-status-awareness">Who in this household is aware of the child's HIV status?</td>
-                    <td>
-                        <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-                        5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Guardian,Parent,Grand Parent,Sibling,Relative,Foster care"
-                             style="checkbox"/>
-
+                    <td colspan="3">
+                        <div style="float: left; padding-right: 50px">
+                            <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Parent" style="checkbox" /><br />
+                            <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Grand Parent" style="checkbox" /><br />
+                            <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Foster parent" style="checkbox" /><br />
+                            <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Relative" style="checkbox" /><br />
+                            <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Sibling" style="checkbox" /><br />
+                            <obs conceptId="159424AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Guardian" style="checkbox" /><br />
+                        </div>
                     </td>
                 </tr>
                 <tr>
                     <td id="other-living-with-hiv">Who else in the home is living with HIV?</td>
-                    <td>
-                        <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptIds="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,
-                        5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-                             answerLabels="Guardian,Parent,Grand Parent,Sibling,Relative,Foster care,none"
-                             style="checkbox"/>
-
+                    <td colspan="3">
+                        <div style="float: left; padding-right: 50px">
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Parent" style="checkbox" /><br />
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="973AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Grand Parent" style="checkbox" /><br />
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="159894AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Foster parent" style="checkbox" /><br />
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="5620AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Relative" style="checkbox" /><br />
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="972AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Sibling" style="checkbox" /><br />
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="160639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="Guardian" style="checkbox" /><br />
+                            <obs conceptId="5587AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerConceptId="1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" answerLabel="None" style="checkbox" /><br />
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -182,7 +215,7 @@
                 <tr>
                     <td id="amount-of-income">How much would you say is the household income?</td>
                     <td>
-                        <obs conceptId="159776AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                        <obs conceptId="164992"/>
                     </td>
                 </tr>
                 <tr>
@@ -190,7 +223,7 @@
                         the child?
                     </td>
                     <td>
-                        <obs conceptId="1474AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                        <obs conceptId="160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
                     </td>
                 </tr>
                 <tr>
@@ -252,7 +285,7 @@
                 <tr id="day-school">
                     <td id="distance-to-sch">How far is the child's school from home?</td>
                     <td>
-                        <obs conceptId="1811AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
+                        <obs conceptId="162725AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
 
                     </td>
 
