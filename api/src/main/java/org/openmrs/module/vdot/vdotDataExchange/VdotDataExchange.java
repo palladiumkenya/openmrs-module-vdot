@@ -348,15 +348,15 @@ public class VdotDataExchange {
 		return message;
 		
 	}
-
-
+	
 	/**
 	 * Returns a county's code
+	 * 
 	 * @param name
 	 * @return
 	 */
 	private String getCountyCodes(String name) {
-
+		
 		ArrayNode countyListNode = Utils.getCountyCodes();
 		String countyName = "";
 		String countyCode = "";
@@ -479,28 +479,29 @@ public class VdotDataExchange {
 		return message;
 		
 	}
-
+	
 	/**
 	 * Process VDOT program discontinuation data
-	 *
 	 */
-	private static void discontinuePatientFromVdotProgram(Patient patient, Date discontinuationDate, String discontinuationReason) {
-
+	private static void discontinuePatientFromVdotProgram(Patient patient, Date discontinuationDate,
+	        String discontinuationReason) {
+		
 		PatientProgram lastEnrollment = getActiveProgram(patient, VdotMetadata._Program.VDOT_PROGRAM);
 		if (lastEnrollment != null) {
 			lastEnrollment.setDateCompleted(discontinuationDate);
 			Context.getProgramWorkflowService().savePatientProgram(lastEnrollment);
 		}
-
+		
 		Encounter enc = new Encounter();
-		enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION));
+		enc.setEncounterType(Context.getEncounterService().getEncounterTypeByUuid(
+		    VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION));
 		enc.setEncounterDatetime(discontinuationDate);
 		enc.setPatient(patient);
 		enc.addProvider(Context.getEncounterService().getEncounterRole(1), Context.getProviderService().getProvider(1));
 		enc.setForm(Context.getFormService().getFormByUuid(VdotMetadata._Form.VDOT_COMPLETION));
-
+		
 		// set discontinuation reason
-
+		
 		ConceptService conceptService = Context.getConceptService();
 		Obs o = new Obs();
 		o.setConcept(conceptService.getConcept(161555));
@@ -509,7 +510,7 @@ public class VdotDataExchange {
 		o.setLocation(enc.getLocation());
 		o.setObsDatetime(discontinuationDate);
 		o.setPerson(patient);
-
+		
 		//TODO: please match the strings as they come from vdot
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(discontinuationReason)) {
 			if (discontinuationReason.equalsIgnoreCase("DISCHARGE")) {
@@ -526,19 +527,21 @@ public class VdotDataExchange {
 				o.setValueCoded(conceptService.getConcept(1067)); // unknown
 			}
 		}
-
+		
 		enc.addObs(o);
 		Context.getEncounterService().saveEncounter(enc);
 	}
-
+	
 	/**
 	 * Checks if a contact is enrolled in a program
+	 * 
 	 * @param patient
 	 * @return
 	 */
 	public static PatientProgram getActiveProgram(Patient patient, String programUUID) {
 		ProgramWorkflowService service = Context.getProgramWorkflowService();
-		List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null, null, null,null, true);
+		List<PatientProgram> programs = service.getPatientPrograms(patient, service.getProgramByUuid(programUUID), null,
+		    null, null, null, true);
 		return programs.size() > 0 ? programs.get(programs.size() - 1) : null;
 	}
 	

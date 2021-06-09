@@ -302,64 +302,22 @@ public class Utils {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Returns an array of counties and their codes
+	 * 
 	 * @return
 	 */
 	public static ArrayNode getCountyCodes() {
-
+		
 		ArrayNode countyListNode = getJsonNodeFactory().arrayNode();
-		List<String> countyNameList = Arrays.asList(
-				"Mombasa",
-				"Kwale",
-				"Kilifi",
-				"Tana River",
-				"Lamu",
-				"Taita-Taveta",
-				"Garissa",
-				"Wajir",
-				"Mandera",
-				"Marsabit",
-				"Isiolo",
-				"Meru",
-				"Tharaka-Nithi",
-				"Embu",
-				"Kitui",
-				"Machakos",
-				"Makueni",
-				"Nyandarua",
-				"Nyeri",
-				"Kirinyaga",
-				"Murang'a",
-				"Kiambu",
-				"Turkana",
-				"West Pokot",
-				"Samburu",
-				"Trans-Nzoia",
-				"Uasin Gishu",
-				"Elgeyo-Marakwet",
-				"Nandi",
-				"Baringo",
-				"Laikipia",
-				"Nakuru",
-				"Narok",
-				"Kajiado",
-				"Kericho",
-				"Bomet",
-				"Kakamega",
-				"Vihiga",
-				"Bungoma",
-				"Busia",
-				"Siaya",
-				"Kisumu",
-				"Homa Bay",
-				"Migori",
-				"Kisii",
-				"Nyamira",
-				"Nairobi"
-		);
-
+		List<String> countyNameList = Arrays.asList("Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita-Taveta",
+		    "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka-Nithi", "Embu", "Kitui", "Machakos",
+		    "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", "Kiambu", "Turkana", "West Pokot", "Samburu",
+		    "Trans-Nzoia", "Uasin Gishu", "Elgeyo-Marakwet", "Nandi", "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado",
+		    "Kericho", "Bomet", "Kakamega", "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", "Kisii",
+		    "Nyamira", "Nairobi");
+		
 		//process the name list in the order that it appears. Distorting the order changes the mapped key
 		for (int i = 0; i < countyNameList.size(); i++) {
 			ObjectNode countyNode = getJsonNodeFactory().objectNode();
@@ -367,7 +325,7 @@ public class Utils {
 			countyNode.put("Code", i + 1);
 			countyListNode.add(countyNode);
 		}
-
+		
 		return countyListNode;
 	}
 	

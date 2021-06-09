@@ -10,10 +10,13 @@
 package org.openmrs.module.vdot.page.controller;
 
 import org.openmrs.Patient;
+import org.openmrs.PatientProgram;
 import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.VdotConstants;
 import org.openmrs.module.kenyaui.annotation.AppPage;
+import org.openmrs.module.vdot.metadata.VdotMetadata;
+import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -26,6 +29,7 @@ import java.util.List;
 public class VdotPatientProfilePageController {
 	
 	public void controller(@RequestParam("patientId") Patient patient, PageModel model) {
-		
+		PatientProgram lastEnrollment = null;//VdotDataExchange.getActiveProgram(patient, VdotMetadata._Program.VDOT_PROGRAM);
+		model.put("enrolledInVdot", lastEnrollment != null ? true : true);
 	}
 }
