@@ -60,15 +60,6 @@
             <column name="status" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="reason" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="reason_other" type="varchar(300)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="type" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
             <column name="date" type="datetime">
                 <constraints nullable="false"/>
             </column>
@@ -136,6 +127,42 @@
                                  baseColumnNames="patient_id"
                                  constraintName="patient_for_video_obs" referencedTableName="patient"
                                  referencedColumnNames="patient_id"/>
+    </changeSet>
+
+    <changeSet id="kenyaemr_vdot_004" author="pwangoo">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <columnExists tableName="kenyaemr_vdot_nimeconfirm_enrolment" columnName="reason"/>
+                </not>
+                <not>
+                    <columnExists tableName="kenyaemr_vdot_nimeconfirm_enrolment" columnName="reason_other"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="kenyaemr_vdot_nimeconfirm_enrolment">
+            <column name="reason" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="reason_other" type="varchar(300)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="kenyaemr_vdot_005" author="pwangoo">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <not>
+                    <columnExists tableName="kenyaemr_vdot_nimeconfirm_enrolment" columnName="type"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="kenyaemr_vdot_nimeconfirm_enrolment">
+            <column name="type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>
