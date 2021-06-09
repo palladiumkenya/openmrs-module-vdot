@@ -377,7 +377,7 @@ public class VdotDataExchange {
 		return countyCode;
 	}
 	
-	private ObjectNode extractEnrollmentReasonToVdotProgram(Patient patient) {
+	public ObjectNode extractEnrollmentReasonToVdotProgram(Patient patient) {
 		Encounter lastEnrollmentEncounter = EmrUtils.lastEncounter(patient, Context.getEncounterService()
 		        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_ENROLLMENT), Context.getFormService()
 		        .getFormByUuid(VdotMetadata._Form.VDOT_ENROLLMENT));
