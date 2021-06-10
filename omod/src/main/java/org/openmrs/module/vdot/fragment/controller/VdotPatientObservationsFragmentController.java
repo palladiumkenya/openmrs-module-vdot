@@ -152,21 +152,21 @@ public class VdotPatientObservationsFragmentController {
 									JSONParser parser = new JSONParser();
 									JSONObject responseObj = (JSONObject) parser.parse(EntityUtils.toString(response
 									        .getEntity()));
-									JSONObject errorObj = (JSONObject) responseObj.get("error");
+									//	JSONObject errorObj = (JSONObject) responseObj.get("error");
 									System.out.println("Error while submitting enrollment sample. " + "Error - "
-									        + statusCode + ". Msg" + errorObj.get("message"));
+									        + statusCode + ". Msg" + responseObj.get("message"));
 									log.error("Error while submitting enrollment. " + "Error - " + statusCode + ". Msg"
-									        + errorObj.get("message"));
+									        + responseObj.get("message"));
 								} else {
 									
 									JSONParser parser = new JSONParser();
 									JSONObject responseObj = (JSONObject) parser.parse(EntityUtils.toString(response
 									        .getEntity()));
-									JSONObject errorObj = (JSONObject) responseObj.get("error");
+									//JSONObject errorObj = (JSONObject) responseObj.get("error");
 									System.out.println("Error while submitting enrollment sample.  " + "Error - "
-									        + statusCode + ". Msg" + errorObj.get("message"));
+									        + statusCode + ". Msg" + responseObj.get("message"));
 									log.error("Error while submitting enrollment. " + "Error - " + statusCode + ". Msg"
-									        + errorObj.get("message"));
+									        + responseObj.get("message"));
 									
 								}
 								Context.flushSession();
