@@ -38,6 +38,7 @@ import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -71,6 +72,8 @@ public class VdotDataExchange {
 	        .getEncounterTypeByUuid(VdotMetadata._EncounterType.VDOT_CLIENT_DISCONTINUATION);
 	
 	public static final Locale LOCALE = Locale.ENGLISH;
+	
+	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
 	/**
 	 * Returns a single object details for patients enrolled in VDOT program
@@ -437,7 +440,11 @@ public class VdotDataExchange {
 				if (patientArrayNode.size() > 0) {
 					for (int i = 0; i < patientArrayNode.size(); i++) {
 						String ccc = patientArrayNode.get(i).get("cccNo").asText();
-						ObjectNode questionnairePayload = (ObjectNode) patientArrayNode.get(i).get("baselineQuestionnaire");
+						ObjectNode questionnairePayload = null;
+						if (patientArrayNode.get(i).get("baselineQuestionnaire") != null) {
+							questionnairePayload = (ObjectNode) patientArrayNode.get(i).get("baselineQuestionnaire");
+						}
+						
 						Patient patient = Context.getPatientService().identifierInUse(ccc,
 						    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
 						Map<String, List<String>> groupedVideoTimeStamps = null;
@@ -469,9 +476,18 @@ public class VdotDataExchange {
 								}
 								
 							}
-							if (patient != null && !questionnairePayload.isEmpty()) {
+							if (patient != null && questionnairePayload != null) {
 								processBaselineQuestionnaire(questionnairePayload, patient);
 								
+							}
+							
+							if (patient != null && patientStatus.equalsIgnoreCase("Discontinued")) {
+								ObjectNode discontinueData = null;
+								if (patientArrayNode.get(i).get("discontinueData") != null) {
+									discontinueData = (ObjectNode) patientArrayNode.get(i).get("discontinueData");
+									discontinuePatientFromVdotProgram(patient, discontinueData);
+								}
+
 							}
 							
 						}
@@ -496,8 +512,17 @@ public class VdotDataExchange {
 	/**
 	 * Process VDOT program discontinuation data
 	 */
-	private static void discontinuePatientFromVdotProgram(Patient patient, Date discontinuationDate,
-	        String discontinuationReason) {
+	private static void discontinuePatientFromVdotProgram(Patient patient, ObjectNode discontinueData) {
+		
+		Date discontinuationDate = null;
+		try {
+			discontinuationDate = dateFormat.parse(discontinueData.get("dateDiscontinued").asText());
+		}
+		catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		String discontinuationReason = discontinueData.get("discontinuationReason").asText();
 		
 		PatientProgram lastEnrollment = getActiveProgram(patient, VdotMetadata._Program.VDOT_PROGRAM);
 		if (lastEnrollment != null) {
