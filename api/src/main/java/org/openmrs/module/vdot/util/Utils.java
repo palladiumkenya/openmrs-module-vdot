@@ -246,7 +246,7 @@ public class Utils {
 		conceptMap.put("schoolDistance", 162725);
 		conceptMap.put("noOfMeals", 162523);
 		//value boolean
-		conceptMap.put("goesToSchool", 159928);
+		conceptMap.put("goesToSchool", 5606);
 		conceptMap.put("toiletAccess", 160258);
 		if (conceptMap.containsKey(name)) {
 			concept = conceptMap.get(name);
