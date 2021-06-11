@@ -140,7 +140,7 @@ public class VdotEnrollmentInformation {
 			} else if (obs.getConcept().getConceptId().equals(meansOfTransportConcept)) {
 				meansOfTransport = meansOfTransportConverter(obs.getValueCoded());
 			} else if (obs.getConcept().getConceptId().equals(distanceFromSchoolConcept)) {
-				distanceToSchool = obs.getValueNumeric() != null ? obs.getValueNumeric().toString() : "";
+				distanceToSchool = obs.getValueText() != null ? obs.getValueText() : "";
 			}
 		}
 		
