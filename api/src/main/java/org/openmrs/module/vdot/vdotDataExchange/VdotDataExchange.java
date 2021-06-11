@@ -487,7 +487,7 @@ public class VdotDataExchange {
 									discontinueData = (ObjectNode) patientArrayNode.get(i).get("discontinueData");
 									discontinuePatientFromVdotProgram(patient, discontinueData);
 								}
-
+								
 							}
 							
 						}
@@ -551,15 +551,15 @@ public class VdotDataExchange {
 		
 		//TODO: please match the strings as they come from vdot
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(discontinuationReason)) {
-			if (discontinuationReason.equalsIgnoreCase("DISCHARGE")) {
+			if (discontinuationReason.equalsIgnoreCase("Transferred out")) {
 				o.setValueCoded(conceptService.getConcept(159492));// transferred out
-			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+			} else if (discontinuationReason.equalsIgnoreCase("Died")) {
 				o.setValueCoded(conceptService.getConcept(160034)); // dead
-			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+			} else if (discontinuationReason.equalsIgnoreCase("Lost to follow up")) {
 				o.setValueCoded(conceptService.getConcept(5240)); // Lost to followup
 			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
 				o.setValueCoded(conceptService.getConcept(819)); // cannot afford treatment
-			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+			} else if (discontinuationReason.equalsIgnoreCase("Other")) {
 				o.setValueCoded(conceptService.getConcept(5622)); // other
 			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
 				o.setValueCoded(conceptService.getConcept(1067)); // unknown

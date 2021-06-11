@@ -6,6 +6,7 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.kenyacore.RegimenMappingUtils;
 import org.openmrs.module.kenyaemr.util.EmrUtils;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.ui.framework.SimpleObject;
@@ -38,7 +39,13 @@ public class VdotEnrollmentInformation {
 			baselineData = getVdotBaselineQuestionnaireInformation(lastBaselineEncounter.getObs());
 		}
 		
-		return SimpleObject.create("enrollmentData", enrollmentData, "baselineData", baselineData);
+		Encounter currentRegimenEncounter = RegimenMappingUtils.getLastEncounterForProgram(patient, "ARV");
+		SimpleObject regimenDetails = RegimenMappingUtils.buildRegimenChangeObject(currentRegimenEncounter.getObs(),
+		    currentRegimenEncounter);
+		String regimenName = (String) regimenDetails.get("regimenShortDisplay");
+		
+		return SimpleObject.create("enrollmentData", enrollmentData, "baselineData", baselineData, "regimenName",
+		    regimenName);
 	}
 	
 	SimpleObject getVdotEnrollmentFormData(Set<Obs> obsList) {

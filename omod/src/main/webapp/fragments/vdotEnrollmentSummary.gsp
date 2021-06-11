@@ -32,12 +32,12 @@
         <div style="float: left; width: 30%; text-align: left">
             <div>
                 <span class="ke-data-point">Current regimen:</span>
-                <span class="ke-datapoint-value">TDF + 3TC + EFV</span>
+                <span class="ke-datapoint-value">${enrollment.regimenName != null ? enrollment.regimenName : ""}</span>
             </div>
 
             <div>
                 <span class="ke-data-point">Regimen frequency:</span>
-                <span class="ke-datapoint-value">Three times daily</span>
+                <span class="ke-datapoint-value">Twice daily</span>
             </div>
         </div>
     </div>
