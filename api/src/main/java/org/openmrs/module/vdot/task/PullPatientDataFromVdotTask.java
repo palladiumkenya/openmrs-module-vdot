@@ -11,25 +11,31 @@ package org.openmrs.module.vdot.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.openmrs.api.context.Context;
-import org.openmrs.module.vdot.util.PushVdotEnrollmentInformation;
+import org.openmrs.module.vdot.util.FetchVdotPatientInformation;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
+import java.io.IOException;
+
 /**
- * Task to automatically push enrollment information to Vdto system
+ * Task used to automatically pull data from Vdot system
  */
-public class PushPatientInfoToVdotTask extends AbstractTask {
+public class PullPatientDataFromVdotTask extends AbstractTask {
 	
-	private Log log = LogFactory.getLog(PushPatientInfoToVdotTask.class);
+	private Log log = LogFactory.getLog(PullPatientDataFromVdotTask.class);
 	
 	/**
 	 * @see AbstractTask#execute()
 	 */
 	public void execute() {
 		Context.openSession();
-		PushVdotEnrollmentInformation pushVdotEnrollmentInformation = new PushVdotEnrollmentInformation();
-		pushVdotEnrollmentInformation.postEnrollmentMessage();
+		FetchVdotPatientInformation fetchVdotPatientInformation = new FetchVdotPatientInformation();
+		try {
+			fetchVdotPatientInformation.getNimeConfirmVideoObs();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	

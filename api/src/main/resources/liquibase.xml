@@ -138,4 +138,55 @@
                                  referencedColumnNames="patient_id"/>
     </changeSet>
 
+    <!--Adding scheduled task to pull patient data from vdot system-->
+    <changeSet id="kenyaemr_vdot_004" author="makombe">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.vdot.task.PullPatientDataFromVdotTask'
+                And name = 'Pull Patient data from Vdot system'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting processor for pulling patient data from vdot system into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="Pull Patient data from Vdot system" />
+            <column name="description" value="Pull Patient data from Vdot system" />
+            <column name="schedulable_class" value="org.openmrs.module.vdot.task.PullPatientDataFromVdotTask" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2021-06-10T19:59:59" />
+            <column name="repeat_interval" value="7200" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="1" />
+            <column name="started" value="1" />
+            <column name="uuid" value="f1cfa08e-ca84-11eb-b8bc-0242ac130003" />
+        </insert>
+    </changeSet>
+
+
+    <!--Adding scheduled task queue enrollment data for vdot-->
+    <changeSet id="kenyaemr_vdot_005" author="makombe">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.vdot.task.VdotQueueDataProcessorTask'
+                And name = 'Vdot Enrollment Queue Data Processor'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting processor for pushing patient info to vdot system into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="Vdot Enrollment Queue Data Processor" />
+            <column name="description" value="Vdot Enrollment Queue Data Processor" />
+            <column name="schedulable_class" value="org.openmrs.module.vdot.task.VdotQueueDataProcessorTask" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="2021-06-10T19:59:59" />
+            <column name="repeat_interval" value="180" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="1" />
+            <column name="started" value="1" />
+            <column name="uuid" value="c2007fc0-ca86-11eb-b8bc-0242ac130003" />
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
