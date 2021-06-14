@@ -4,24 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.core.type.TypeReference;
-
-//import org.codehaus.jackson.map.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BaseJsonNode;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.json.simple.JSONArray;
+
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.kenyaemr.util.EmrUtils;
 import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
-import org.openmrs.module.vdot.api.impl.NimeconfirmServiceImpl;
 import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.calculation.result.CalculationResult;
 
@@ -37,7 +30,6 @@ import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -371,8 +363,7 @@ public class VdotDataExchange {
 		o.setLocation(enc.getLocation());
 		o.setObsDatetime(discontinuationDate);
 		o.setPerson(patient);
-		
-		//TODO: please match the strings as they come from vdot
+
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(discontinuationReason)) {
 			if (discontinuationReason.equalsIgnoreCase("Transferred out")) {
 				o.setValueCoded(conceptService.getConcept(159492));// transferred out
@@ -380,12 +371,14 @@ public class VdotDataExchange {
 				o.setValueCoded(conceptService.getConcept(160034)); // dead
 			} else if (discontinuationReason.equalsIgnoreCase("Lost to follow up")) {
 				o.setValueCoded(conceptService.getConcept(5240)); // Lost to followup
-			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+			} else if (discontinuationReason.equalsIgnoreCase("cannot afford treatment")) {
 				o.setValueCoded(conceptService.getConcept(819)); // cannot afford treatment
 			} else if (discontinuationReason.equalsIgnoreCase("Other")) {
 				o.setValueCoded(conceptService.getConcept(5622)); // other
-			} else if (discontinuationReason.equalsIgnoreCase("DEAD")) {
+			} else if (discontinuationReason.equalsIgnoreCase("Unknown")) {
 				o.setValueCoded(conceptService.getConcept(1067)); // unknown
+			} else if (discontinuationReason.equalsIgnoreCase("Repeat VL outcome(Suppressed)")) {
+				o.setValueCoded(conceptService.getConcept(165244)); // suppressed VL
 			}
 		}
 		
