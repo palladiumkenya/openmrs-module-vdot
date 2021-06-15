@@ -363,7 +363,7 @@ public class VdotDataExchange {
 		o.setLocation(enc.getLocation());
 		o.setObsDatetime(discontinuationDate);
 		o.setPerson(patient);
-
+		
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(discontinuationReason)) {
 			if (discontinuationReason.equalsIgnoreCase("Transferred out")) {
 				o.setValueCoded(conceptService.getConcept(159492));// transferred out
@@ -414,40 +414,46 @@ public class VdotDataExchange {
 				Integer conceptId = Utils.conceptNameToIdMapper(pair.getKey());
 				
 				Obs o = new Obs();
-				
-				if (conceptId == 159892 || conceptId == 159424 || conceptId == 5587) {
-					ArrayNode arrNode = handleMultiSelectOptions(pair.getValue().asText());
+				if (conceptId != null) {
 					
-					for (JsonNode i : arrNode) {
-						Obs obs = new Obs();
-						obs.setConcept(cs.getConcept(conceptId));
-						obs.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(i.asText())));
-						obs.setDateCreated(new Date());
-						obs.setCreator(Context.getAuthenticatedUser());
-						obs.setObsDatetime(new Date());
-						obs.setPerson(patient);
-						individualObsList.add(obs);
-					}
-					
-				} else {
-					
-					o.setConcept(cs.getConcept(conceptId));
-					o.setDateCreated(new Date());
-					o.setCreator(Context.getAuthenticatedUser());
-					o.setObsDatetime(new Date());
-					o.setPerson(patient);
-					if (conceptId == 164992 || conceptId == 160632 || conceptId == 162725) {
-						o.setValueText(pair.getValue().asText());
+					if (conceptId == 159892 || conceptId == 159424 || conceptId == 5587) {
+						ArrayNode arrNode = handleMultiSelectOptions(pair.getValue().asText());
 						
-					} else if (conceptId == 162523) {
-						o.setValueNumeric((pair.getValue().doubleValue()));
+						for (JsonNode i : arrNode) {
+							Obs obs = new Obs();
+							obs.setConcept(cs.getConcept(conceptId));
+							obs.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(i.asText())));
+							obs.setDateCreated(new Date());
+							obs.setCreator(Context.getAuthenticatedUser());
+							obs.setObsDatetime(new Date());
+							obs.setPerson(patient);
+							individualObsList.add(obs);
+						}
 						
 					} else {
-						o.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(pair.getValue().asText())));
+						
+						o.setConcept(cs.getConcept(conceptId));
+						o.setDateCreated(new Date());
+						o.setCreator(Context.getAuthenticatedUser());
+						o.setObsDatetime(new Date());
+						o.setPerson(patient);
+						if (conceptId == 164992 || conceptId == 160632 || conceptId == 162725) {
+							o.setValueText(pair.getValue().asText());
+							
+						} else if (conceptId == 162523) {
+							o.setValueNumeric(Double.parseDouble(pair.getValue().asText()));
+							
+						} else {
+							Integer ansConceptId = Utils.ansConceptNameToIdMapper(pair.getValue().asText());
+							if (ansConceptId != null) {
+								o.setValueCoded(cs.getConcept(ansConceptId));
+								
+							}
+							
+						}
+						individualObsList.add(o);
 						
 					}
-					individualObsList.add(o);
-					
 				}
 				
 				encounter.setPatient(patient);
