@@ -422,7 +422,11 @@ public class VdotDataExchange {
 						for (JsonNode i : arrNode) {
 							Obs obs = new Obs();
 							obs.setConcept(cs.getConcept(conceptId));
-							obs.setValueCoded(cs.getConcept(Utils.ansConceptNameToIdMapper(i.asText())));
+							Integer ansConceptId = Utils.ansConceptNameToIdMapper(i.asText());
+							if (ansConceptId != null) {
+								obs.setValueCoded(cs.getConcept(ansConceptId));
+								
+							}
 							obs.setDateCreated(new Date());
 							obs.setCreator(Context.getAuthenticatedUser());
 							obs.setObsDatetime(new Date());
