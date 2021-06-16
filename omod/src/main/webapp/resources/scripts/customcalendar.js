@@ -2,6 +2,7 @@ var CALENDAR = function () {
 
     //var patientobject = JSON.parse(patientO);
     var patientobject = patientO;
+    var vdotRegimenFrequency = patientobject.frequency;
 
     var monthSelect = document.getElementById('monthSelect');
     var btnSearch = document.getElementById('btnSearch');
@@ -148,7 +149,7 @@ var CALENDAR = function () {
                 '<i style = "color:green; font-size: 18px;" class="fas fa-check-circle"></i>';
             var iconmissed =
                 '<i style = "font-size: 18px;" class="far fa-times-circle"></i>';
-            var frequency = 2;
+            var frequency = vdotRegimenFrequency;
             /*if (patientobject.patientRegimen != null && patientobject.patientRegimen !== ''){
               frequency = patientobject.patientRegimen.frequency;
             }*/

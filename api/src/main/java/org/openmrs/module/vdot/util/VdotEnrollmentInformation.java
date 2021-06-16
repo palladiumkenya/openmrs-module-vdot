@@ -1,17 +1,20 @@
 package org.openmrs.module.vdot.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.kenyacore.RegimenMappingUtils;
 import org.openmrs.module.kenyaemr.util.EmrUtils;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
+import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
 import org.openmrs.ui.framework.SimpleObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,13 +42,22 @@ public class VdotEnrollmentInformation {
 			baselineData = getVdotBaselineQuestionnaireInformation(lastBaselineEncounter.getObs());
 		}
 		
-		Encounter currentRegimenEncounter = RegimenMappingUtils.getLastEncounterForProgram(patient, "ARV");
-		SimpleObject regimenDetails = RegimenMappingUtils.buildRegimenChangeObject(currentRegimenEncounter.getObs(),
-		    currentRegimenEncounter);
-		String regimenName = (String) regimenDetails.get("regimenShortDisplay");
+		SimpleObject regimenDetails = VdotDataExchange.getCurrentRegimenDetails(patient);
 		
-		return SimpleObject.create("enrollmentData", enrollmentData, "baselineData", baselineData, "regimenName",
-		    regimenName);
+		return SimpleObject.create(
+		    "enrollmentData",
+		    enrollmentData,
+		    "baselineData",
+		    baselineData,
+		    "regimenName",
+		    regimenDetails.get("regimen"),
+		    "regimenCode",
+		    regimenDetails.get("regimenCode"),
+		    "regimenFrequency",
+		    regimenDetails.get("frequency"),
+		    "enrollmentDate",
+		    lastEnrollmentEncounter != null ? Utils.getSimpleDateFormat("dd-MMM-yyyy").format(
+		        lastEnrollmentEncounter.getEncounterDatetime()) : "");
 	}
 	
 	SimpleObject getVdotEnrollmentFormData(Set<Obs> obsList) {
@@ -57,17 +69,26 @@ public class VdotEnrollmentInformation {
 		String consent = "";
 		String enrollmentReason = "";
 		String enrollmentReasonOther = "";
+		List<String> mergeEnrollmentReasons = new ArrayList<String>();
 		
 		for (Obs obs : obsList) {
 			
 			if (obs.getConcept().getConceptId().equals(enrollmentReasonConcept)) {
-				enrollmentReason = enrollmentReasonConverter(obs.getValueCoded());
+				String reason = enrollmentReasonConverter(obs.getValueCoded());
+				if (reason != null) {
+					mergeEnrollmentReasons.add(reason);
+				}
 			} else if (obs.getConcept().getConceptId().equals(enrollmentReasonOtherConcept)) {
 				enrollmentReasonOther = obs.getValueText();
 			} else if (obs.getConcept().getConceptId().equals(consentConcept)) {
-				consent = obs.getValueCoded().getConceptId().equals(1065) ? "Yes" : "No";
+				consent = obs.getValueCoded().getConceptId().equals(1065) ? "Yes" : obs.getValueCoded().getConceptId()
+				        .equals(1066) ? "No" : "";
 			}
 		}
+		if (StringUtils.isNotBlank(enrollmentReasonOther)) {
+			mergeEnrollmentReasons.add(enrollmentReasonOther);
+		}
+		enrollmentReason = StringUtils.join(mergeEnrollmentReasons, ",");
 		return SimpleObject.create("enrollmentReason", enrollmentReason, "enrollmentReasonOther", enrollmentReasonOther,
 		    "consent", consent);
 		

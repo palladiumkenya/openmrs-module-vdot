@@ -102,7 +102,6 @@
     jQuery(function () {
 
         patientO = ${ patientData };
-        console.log('Patient data' + JSON.stringify(patientO));
         var cal = CALENDAR();
         cal.init();
     });

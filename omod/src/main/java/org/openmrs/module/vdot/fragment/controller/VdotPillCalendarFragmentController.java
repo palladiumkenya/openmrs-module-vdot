@@ -19,6 +19,8 @@ import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.vdot.api.INimeconfirmService;
 import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
+import org.openmrs.module.vdot.vdotDataExchange.VdotDataExchange;
+import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
 import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,8 +50,24 @@ public class VdotPillCalendarFragmentController {
 		}
 		b = StringUtils.join(allVideoTimestamps, ",");
 		
+		SimpleObject regimenDetails = VdotDataExchange.getCurrentRegimenDetails(patient);
+		
+		Integer drugFrequency = 0;
+		String frequencyCode = (String) regimenDetails.get("frequency");
+		
+		if (StringUtils.isNotBlank(frequencyCode)) {
+			if (frequencyCode.equalsIgnoreCase("TD")) {
+				drugFrequency = 3;
+			} else if (frequencyCode.equalsIgnoreCase("BD")) {
+				drugFrequency = 2;
+			} else {
+				drugFrequency = 1;
+			}
+		}
+		
 		Map<String, Object> jsonConfig = new LinkedHashMap<String, Object>();
 		jsonConfig.put("dateofEnrollment", "2021-04-07");
+		jsonConfig.put("frequency", drugFrequency);
 		if (StringUtils.isNotBlank(b)) {
 			jsonConfig.put("dates", Arrays.asList(b.split(",")));
 		} else {
