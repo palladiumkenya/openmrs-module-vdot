@@ -73,8 +73,11 @@ public class PushVdotEnrollmentInformation {
 					return;
 				} else {
 					for (NimeconfirmEnrolment enrolment : nimeconfirmEnrolments) {
+						String[] cipherSuites = new String[] { "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+						        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA" };
 						SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(SSLContexts.createDefault(),
-						        new String[] { "TLSv1.2" }, null, SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+						        new String[] { "TLSv1.2" }, cipherSuites,
+						        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 						
 						CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
 						if (enrolment.getStatus().equalsIgnoreCase("Pending")) {

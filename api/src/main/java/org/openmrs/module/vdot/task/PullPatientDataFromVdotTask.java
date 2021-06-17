@@ -32,6 +32,7 @@ public class PullPatientDataFromVdotTask extends AbstractTask {
 		FetchVdotPatientInformation fetchVdotPatientInformation = new FetchVdotPatientInformation();
 		try {
 			fetchVdotPatientInformation.getNimeConfirmVideoObs();
+			System.out.println("Successfully executed the task that pulls data from nimeconfirm server");
 		}
 		catch (IOException e) {
 			e.printStackTrace();

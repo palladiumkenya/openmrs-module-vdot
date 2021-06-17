@@ -337,6 +337,10 @@ public class VdotDataExchange {
 						
 						Patient patient = Context.getPatientService().identifierInUse(ccc,
 						    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
+						if (patient == null) {
+							System.out.println("No matching patient found for identifier " + ccc);
+							continue;
+						}
 						Map<String, List<String>> groupedVideoTimeStamps = null;
 						try {
 							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");
