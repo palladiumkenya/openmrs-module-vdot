@@ -4,36 +4,49 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.openmrs.*;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.Form;
+import org.openmrs.Location;
+import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.PatientProgram;
+import org.openmrs.Program;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.kenyaemr.util.EmrUtils;
-import org.openmrs.module.vdot.api.INimeconfirmService;
-import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
-import org.openmrs.util.PrivilegeConstants;
-import org.openmrs.calculation.result.CalculationResult;
-
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.context.Context;
+import org.openmrs.calculation.result.CalculationResult;
+import org.openmrs.module.kenyacore.RegimenMappingUtils;
 import org.openmrs.module.kenyaemr.calculation.EmrCalculationUtils;
 import org.openmrs.module.kenyaemr.calculation.library.hiv.art.LastViralLoadResultCalculation;
-
-import org.openmrs.module.kenyacore.RegimenMappingUtils;
+import org.openmrs.module.kenyaemr.util.EmrUtils;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
+import org.openmrs.module.vdot.api.INimeconfirmService;
+import org.openmrs.module.vdot.api.NimeconfirmVideoObs;
 import org.openmrs.module.vdot.metadata.VdotMetadata;
 import org.openmrs.module.vdot.util.Utils;
 import org.openmrs.ui.framework.SimpleObject;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import static org.openmrs.module.vdot.util.Utils.getJsonNodeFactory;
 
@@ -175,6 +188,68 @@ public class VdotDataExchange {
 	}
 	
 	/**
+	 * Gets a patient's current regimen and latest prescription details
+	 * 
+	 * @param patient
+	 * @return
+	 */
+	public static SimpleObject getCurrentRegimenDetails(Patient patient) {
+		Context.addProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
+		EncounterService encounterService = Context.getEncounterService();
+		
+		// get last drug regimen encounter
+		
+		StringBuilder q = new StringBuilder();
+		q.append("select max(e.encounter_id)");
+		q.append("from encounter e inner join \n"
+		        + "( select encounter_type_id, uuid, name from encounter_type where uuid ='7df67b83-1b84-4fe2-b1b7-794b4e9bfcc3'\n"
+		        + ") et on et.encounter_type_id=e.encounter_type\n"
+		        + "inner join orders o on o.encounter_id=e.encounter_id and o.voided=0 and o.order_action='NEW' and o.date_stopped is null and o.order_group_id is not null "
+		
+		);
+		q.append("where e.patient_id = " + patient.getPatientId());
+		
+		List<List<Object>> queryData = Context.getAdministrationService().executeSQL(q.toString(), true);
+		Integer encounterId = (Integer) queryData.get(0).get(0);
+		Encounter lastDrugOrderEncounter = null;
+		
+		if (encounterId != null) {
+			lastDrugOrderEncounter = encounterService.getEncounter(encounterId);
+		}
+		String frequency = "";
+		
+		if (lastDrugOrderEncounter != null) {
+			for (Order order : lastDrugOrderEncounter.getOrders()) {
+				if (order != null) {
+					
+					DrugOrder drugOrder = (DrugOrder) order;
+					if (drugOrder.getFrequency() != null && drugOrder.getFrequency().getConcept() != null) {
+						frequency = drugOrder.getFrequency().getConcept().getShortNameInLocale(LOCALE) != null ? drugOrder
+						        .getFrequency().getConcept().getShortNameInLocale(LOCALE).getName() : drugOrder
+						        .getFrequency().getConcept().getName().getName();
+					}
+				}
+			}
+		}
+		
+		Encounter currentRegimenEncounter = RegimenMappingUtils.getLastEncounterForProgram(patient, "ARV");
+		SimpleObject regimenDetails = RegimenMappingUtils.buildRegimenChangeObject(currentRegimenEncounter.getObs(),
+		    currentRegimenEncounter);
+		String regimenName = (String) regimenDetails.get("regimenShortDisplay");
+		String regimenLine = (String) regimenDetails.get("regimenLine");
+		
+		String nascopCode = "";
+		if (StringUtils.isNotBlank(regimenName)) {
+			nascopCode = RegimenMappingUtils.getDrugNascopCodeByDrugNameAndRegimenLine(regimenName, regimenLine);
+		}
+		
+		Context.removeProxyPrivilege(PrivilegeConstants.SQL_LEVEL_ACCESS);
+		return SimpleObject.create("regimenCode", StringUtils.isNotBlank(nascopCode) ? nascopCode
+		        : regimenName != null ? regimenName : "", "regimen", regimenName, "regimenLine", regimenLine, "frequency",
+		    frequency);
+	}
+	
+	/**
 	 * Returns a county's code
 	 * 
 	 * @param name
@@ -262,6 +337,10 @@ public class VdotDataExchange {
 						
 						Patient patient = Context.getPatientService().identifierInUse(ccc,
 						    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
+						if (patient == null) {
+							System.out.println("No matching patient found for identifier " + ccc);
+							continue;
+						}
 						Map<String, List<String>> groupedVideoTimeStamps = null;
 						try {
 							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");

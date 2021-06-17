@@ -10,7 +10,7 @@
     }
 </style>
 <fieldset>
-    <legend>Details of nimeCONFIRM enrollment</legend>
+    <legend>nimeCONFIRM enrollment</legend>
     <div>
         <div style="float: left; width: 35%;">
 
@@ -20,8 +20,8 @@
             </div>
 
             <div>
-                <span class="ke-data-point">Date of enrollment:</span>
-                <span class="ke-datapoint-value">15-May-2020</span>
+                <span class="ke-data-point">Date of last enrollment:</span>
+                <span class="ke-datapoint-value">${enrollment.enrollmentDate ?: ""}</span>
             </div>
             <div>
                 <span class="ke-data-point">Reason for enrollment:</span>
@@ -32,12 +32,12 @@
         <div style="float: left; width: 30%; text-align: left">
             <div>
                 <span class="ke-data-point">Current regimen:</span>
-                <span class="ke-datapoint-value">${enrollment.regimenName != null ? enrollment.regimenName : ""}</span>
+                <span class="ke-datapoint-value">${enrollment.regimenName != null ? enrollment.regimenName : ""} (${enrollment.regimenCode ?: ""})</span>
             </div>
 
             <div>
                 <span class="ke-data-point">Regimen frequency:</span>
-                <span class="ke-datapoint-value">Twice daily</span>
+                <span class="ke-datapoint-value">${enrollment.regimenFrequency ?: ""}</span>
             </div>
         </div>
     </div>
