@@ -47,10 +47,12 @@ public class FetchVdotPatientInformation {
 		
 		GlobalProperty gpServerUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    VdotMetadata.VDOT_OBSERVATION_GET_API);
+		GlobalProperty gpApiToken = Context.getAdministrationService().getGlobalPropertyObject(VdotMetadata.VDOT_PWD);
 		String serverUrl = gpServerUrl.getPropertyValue();
 		String timeStamp = gpTimeStamp.getPropertyValue();
+		String API_KEY = gpApiToken.getPropertyValue();
 		
-		if (StringUtils.isBlank(serverUrl)) {
+		if (StringUtils.isBlank(serverUrl) || StringUtils.isBlank(API_KEY)) {
 			System.out.println("Please set credentials for pulling vdot observations");
 			return;
 		}
@@ -66,6 +68,8 @@ public class FetchVdotPatientInformation {
 			
 			HttpGet getRequest = new HttpGet(builder.build());
 			getRequest.addHeader("content-type", "application/json");
+			getRequest.addHeader("apikey", API_KEY);
+			
 			CloseableHttpResponse response = httpClient.execute(getRequest);
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (statusCode != 200) {

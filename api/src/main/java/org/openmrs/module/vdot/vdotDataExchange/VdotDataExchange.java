@@ -341,6 +341,7 @@ public class VdotDataExchange {
 							System.out.println("No matching patient found for identifier " + ccc);
 							continue;
 						}
+						
 						Map<String, List<String>> groupedVideoTimeStamps = null;
 						try {
 							SimpleDateFormat vformatter = new SimpleDateFormat("yyyy-MM-dd");

@@ -45,13 +45,13 @@ public class PushVdotEnrollmentInformation {
 				
 				GlobalProperty gpServerUrl = Context.getAdministrationService().getGlobalPropertyObject(
 				    VdotMetadata.VDOT_ENROLLMENT_POST_API);
-				GlobalProperty gpApiToken = Context.getAdministrationService().getGlobalPropertyObject(
-				    VdotMetadata.VDOT_LOGIN_URL);
+				GlobalProperty gpApiToken = Context.getAdministrationService()
+				        .getGlobalPropertyObject(VdotMetadata.VDOT_PWD);
 				
 				String serverUrl = gpServerUrl.getPropertyValue();
-				//	String API_KEY = gpApiToken.getPropertyValue();
+				String API_KEY = gpApiToken.getPropertyValue();
 				
-				if (StringUtils.isBlank(serverUrl)) {
+				if (StringUtils.isBlank(serverUrl) || StringUtils.isBlank(API_KEY)) {
 					System.out.println("Please set credentials for posting  enrollments to the nimeConfirm system");
 					return;
 				}
@@ -89,7 +89,7 @@ public class PushVdotEnrollmentInformation {
 								
 								//Set the API media type in http content-type header
 								postRequest.addHeader("content-type", "application/json");
-								//	postRequest.addHeader("apikey", API_KEY);
+								postRequest.addHeader("apikey", API_KEY);
 								//Set the request post body
 								String payload = enrolment.getPayLoad();
 								StringEntity userEntity = new StringEntity(payload);

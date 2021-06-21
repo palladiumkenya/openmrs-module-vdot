@@ -36,9 +36,7 @@ public class VdotMetadata extends AbstractMetadataBundle {
 	
 	public static final String VDOT_USER = "vdot.login_user";
 	
-	public static final String VDOT_PWD = "vdot.login_pwd";
-	
-	//public static final String GP_IL_LAST_PHARMACY_MESSAGE_ENCOUNTER = "kenyaemrIL.lastPharmacyMessageEncounter";
+	public static final String VDOT_PWD = "vdot.login_pwd"; //used for auth api token
 	
 	public static final String VDOT_LAST_ENROLLMENT_ENCOUNTER = "vdot.lastVdotEnrollment";
 	
