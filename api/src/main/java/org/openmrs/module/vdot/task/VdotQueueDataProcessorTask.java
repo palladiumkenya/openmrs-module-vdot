@@ -42,10 +42,6 @@ public class VdotQueueDataProcessorTask extends AbstractTask {
 		Context.openSession();
 		try {
 			
-			if (!Context.isAuthenticated()) {
-				authenticate();
-			}
-			
 			GlobalProperty lastEncounterEntryFromGP = Context.getAdministrationService().getGlobalPropertyObject(
 			    VdotMetadata.VDOT_LAST_ENROLLMENT_ENCOUNTER);// this will store the last encounter id prior to task execution
 			

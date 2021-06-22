@@ -320,6 +320,7 @@ public class VdotDataExchange {
 	public static String processVideoObs(String payload) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode jsonNode = null;
+		Patient patient = null;
 		String message = "";
 		INimeconfirmService iNimeconfirmService = Context.getService(INimeconfirmService.class);
 		
@@ -335,8 +336,11 @@ public class VdotDataExchange {
 							questionnairePayload = (ObjectNode) patientArrayNode.get(i).get("baselineQuestionnaire");
 						}
 						
-						Patient patient = Context.getPatientService().identifierInUse(ccc,
-						    Context.getPatientService().getPatientIdentifierTypeByUuid(Utils.UNIQUE_PATIENT_NUMBER), null);
+						List<Patient> patients = Context.getPatientService().getPatients(null, ccc, null, true);
+						if (patients.size() > 0) {
+							patient = patients.get(0);
+						}
+						
 						if (patient == null) {
 							System.out.println("No matching patient found for identifier " + ccc);
 							continue;
