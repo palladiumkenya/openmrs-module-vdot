@@ -42,7 +42,7 @@
 		<uiframeworkVersion>3.3.1</uiframeworkVersion>
 		<kenyacoreVersion>2.2</kenyacoreVersion>
 		<kenyauiVersion>2.0.3</kenyauiVersion>
-		<kenyaemrVersion>17.0.3</kenyaemrVersion>
+		<kenyaemrVersion>18.7.0</kenyaemrVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
 		<idgenVersion>2.6</idgenVersion>
 		<jacksonVersion>2.10.1</jacksonVersion>
@@ -407,14 +407,14 @@
 
 	<distributionManagement>
 		<repository>
-			<id>mks-nexus</id>
-			<name>Mekom Nexus Releases</name>
-			<url>https://nexus.mekomsolutions.net/releases</url>
+			<id>mks-repo</id>
+			<name>Mekom Solutions Nexus Releases</name>
+			<url>https://nexus.mekomsolutions.net/repository/maven-releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>mks-nexus</id>
-			<name>Mekom Nexus Snapshots</name>
-			<url>https://nexus.mekomsolutions.net/snapshots</url>
+			<id>mks-repo-snapshots</id>
+			<name>Mekom Solutions Nexus Snapshots</name>
+			<url>https://nexus.mekomsolutions.net/repository/maven-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 	
